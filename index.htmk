@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calm Garden — breathe, ground, and grow</title>
+<meta name="description" content="A tiny soothing game to help you breathe, ground, and pass the time.">
+<style>
+  :root{
+    --bg1:#0f1720; --bg2:#122233; --veil:#c7d7e6cc; --card:#0f1824cc;
+    --ink:#e7f1f6; --muted:#a8b7c6; --accent:#79d0b7; --accent2:#a69cf6; --orb:#8ee6cf;
+    --shadow:0 14px 36px rgba(0,0,0,.35); --radius:18px; --focus:0 0 0 3px rgba(166,156,246,.35);
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg1:#e9f0f6; --bg2:#dfeaf2; --veil:#ffffffb8; --card:#f6f9fcdd; --ink:#0f1a24; --muted:#5d6b79;
+      --accent:#5fbf8f; --accent2:#7fa2ff; --orb:#96e1c2; --shadow:0 10px 28px rgba(18,40,60,.12); --focus:0 0 0 3px rgba(127,162,255,.30);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    color:var(--ink);
+    background: radial-gradient(1200px 800px at 70% -10%, var(--bg2), var(--bg1) 60%);
+    overflow:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; scroll-behavior:smooth;
+  }
+  a{color:var(--accent2)}
+  .wrap{min-height:100%; display:grid; grid-template-rows:auto 1fr auto; position:relative}
+  header{
+    display:flex; align-items:center; gap:12px; padding:12px 16px;
+    background:linear-gradient(0deg, transparent, var(--card)); backdrop-filter:saturate(1.05) blur(8px);
+    border-bottom:1px solid rgba(255,255,255,.06); box-shadow:var(--shadow); z-index:3;
+  }
+  header h1{margin:0; font-size:20px; font-weight:800; letter-spacing:.2px}
+  .tip{color:var(--muted); font-size:12px}
+  .spacer{flex:1}
+  .bar-btn{ background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--ink); padding:8px 12px; border-radius:12px; cursor:pointer; }
+  .bar-btn:focus{outline:none; box-shadow:var(--focus)}
+  main{display:grid; grid-template-columns: 340px 1fr 340px; gap:16px; padding:16px; position:relative; z-index:2}
+  @media (max-width:1100px){ main{grid-template-columns: 320px 1fr} .side-right{display:none} }
+  @media (max-width:760px){ main{grid-template-columns:1fr; padding:12px} .side-left{order:2} .center{order:1} }
+
+  .card{ background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow); backdrop-filter: blur(6px) saturate(1.02); }
+  .title{font-weight:800; margin:0 0 6px 0; letter-spacing:.2px}
+  .desc{color:var(--muted); font-size:13px; margin:0 0 10px 0}
+
+  .orb-wrap{ display:grid; place-items:center; height:min(54vh,470px); position:relative; overflow:hidden; border-radius:var(--radius); background: radial-gradient(320px 260px at 60% 30%, var(--veil), transparent 70%); }
+  .orb{
+    width:200px; height:200px; border-radius:50%;
+    background:
+      radial-gradient(circle at 35% 35%, var(--orb), rgba(255,255,255,.28) 38%, rgba(255,255,255,.08) 58%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);
+    box-shadow:0 24px 40px rgba(0,0,0,.30), inset 0 0 80px rgba(255,255,255,.22);
+    transform: scale(var(--scale,1));
+    transition: transform var(--dur,4s) ease-in-out, filter .6s ease;
+    will-change: transform;
+  }
+  .cue{ position:absolute; bottom:14px; left:50%; transform:translateX(-50%); font-size:16px; font-weight:700; letter-spacing:.4px; background: rgba(0,0,0,.28); padding:8px 12px; border-radius:999px }
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .controls select,.controls button,.controls input[type="range"]{ background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); color:var(--ink); padding:8px 10px; border-radius:10px; cursor:pointer; }
+  .controls input[type="range"]{flex:1}
+  .pill{display:inline-flex; gap:6px; align-items:center; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); color:var(--ink); padding:6px 10px; border-radius:999px; font-size:13px}
+
+  .garden{position:relative; overflow:hidden; min-height:220px; display:flex; flex-direction:column; gap:8px}
+  .soil{ position:absolute; bottom:-20px; left:-20px; right:-20px; height:110px; background: radial-gradient(200px 80px at 50% 0%, rgba(0,0,0,.25), transparent), linear-gradient(#2f3f33, #1d2a21); border-top-left-radius:30px; border-top-right-radius:30px; box-shadow: inset 0 10px 30px rgba(255,255,255,.06); }
+  .plant{position:absolute; bottom:76px; left:50%; transform:translateX(-50%); width:240px; height:240px; pointer-events:none; opacity:.95}
+  .bud,.leaf{position:absolute; background:linear-gradient(180deg, #85dfb0, #2f7a48); border-radius:120px 120px 0 120px; transform-origin:bottom center; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35))}
+  .bud{width:18px;height:18px; left:50%; transform:translateX(-50%) rotate(45deg)}
+  .leaf{width:22px;height:60px; border-radius:60px 60px 0 60px}
+  .stem{position:absolute; left:50%; transform:translateX(-50%); bottom:0; width:6px; height:120px; background:linear-gradient(#3b925e, #215238); border-radius:999px}
+  .progress{display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:12px; background:rgba(255,255,255,.08); font-size:14px}
+  .chip{padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.12)}
+
+  .bubbles{position:relative; min-height:260px; overflow:hidden; border-radius:var(--radius);
+           background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));}
+  .bubble{
+    position:absolute; width:40px;height:40px;border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.75), rgba(255,255,255,.06) 40%, rgba(255,255,255,.03) 65%);
+    border:1px solid rgba(180,200,220,.35); box-shadow: inset 0 0 20px rgba(255,255,255,.25);
+    cursor:pointer; user-select:none; animation: floatUp linear forwards;
+  }
+  @keyframes floatUp{ from{ transform: translateY(0) scale(1); opacity:.9} to{ transform: translateY(-120vh) scale(1.15); opacity:0}}
+  .affirm{position:absolute; pointer-events:none; font-weight:800; text-shadow:0 2px 8px rgba(0,0,0,.45); opacity:0;
+          transform: translate(-50%, -50%) scale(.96); transition: transform .8s ease, opacity .8s ease; left:50%; top:50%;}
+
+  .grounding-area{min-height:220px}
+  .ground-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .ground-pill{display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.10);
+               border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:6px 10px; font-size:13px}
+  .ground-screen{ margin-top:10px; padding:18px; border-radius:14px; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; text-align:center; min-height:120px; font-weight:700; letter-spacing:.3px }
+
+  /* 30s grounding progress */
+  .progress-bar{ position:relative; height:10px; width:100%; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:999px; overflow:hidden; }
+  .progress-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent2)); box-shadow: inset 0 0 8px rgba(0,0,0,.2); transition: width .25s ease; }
+
+  canvas#petals{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+  footer{ padding:12px 14px; font-size:12px; color:var(--muted); background: linear-gradient(0deg, var(--card), transparent); z-index:3; }
+  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .hidden{display:none !important}
+  .sr-only{position:absolute !important; height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}
+</style>
+</head>
+<body>
+<div class="wrap" role="application" aria-label="Calm Garden game">
+  <header>
+    <h1>🌿 Calm Garden</h1>
+    <div class="tip">Breathe, ground, pop bubbles — and grow a tiny plant.</div>
+    <div class="spacer"></div>
+    <button id="restartAll" class="bar-btn" aria-label="Restart everything">🔄 Restart all</button>
+    <button id="mute" class="bar-btn" aria-label="Toggle sound">🔊 Sound: On</button>
+  </header>
+
+  <main>
+    <!-- Breathing -->
+    <section class="side-left card" aria-labelledby="breath-title">
+      <h2 id="breath-title" class="title">Breathing</h2>
+      <p class="desc">Follow the orb through inhale / hold / exhale. Slow rhythmic breathing calms the nervous system.</p>
+      <div class="orb-wrap card" aria-live="polite">
+        <div class="orb" id="orb" role="img" aria-label="Breathing orb"></div>
+        <div class="cue" id="cue">Tap Start</div>
+      </div>
+      <div class="controls">
+        <button id="start" aria-label="Start breathing">▶ Start</button>
+        <button id="stop" aria-label="Stop breathing" disabled>⏸ Stop</button>
+        <label class="pill" for="pattern">Pattern
+          <select id="pattern" aria-label="Breathing pattern">
+            <option value="4-2-6">Calm 4–2–6</option>
+            <option value="4-4-4-4">Box 4–4–4–4</option>
+            <option value="4-7-8">4–7–8</option>
+            <option value="5-5-5">Gentle 5–5–5</option>
+          </select>
+        </label>
+        <label class="pill" for="cyclesWanted">Goal
+          <select id="cyclesWanted" aria-label="Cycle goal">
+            <option>5</option><option selected>10</option><option>15</option><option>20</option>
+          </select>
+        </label>
+        <label class="pill" for="speed">Speed
+          <input id="speed" type="range" min="0.75" max="1.5" step="0.05" value="1" aria-label="Breathing speed" />
+        </label>
+      </div>
+      <div class="progress" aria-live="polite">
+        <span>Cycles: <strong id="cycles">0</strong> / <span id="goal">10</span></span>
+        <span class="chip" id="streak">Streak: 0</span>
+      </div>
+    </section>
+
+    <!-- Center column -->
+    <section class="center">
+      <div class="garden card" aria-labelledby="garden-title">
+        <h2 id="garden-title" class="title">Your tiny garden</h2>
+        <p class="desc">Each 2 cycles adds growth. Watch leaves appear and the stem stretch as you practice.</p>
+        <div class="plant" aria-hidden="true">
+          <span class="stem" id="stem"></span>
+          <span class="bud" id="bud"></span>
+        </div>
+        <div class="soil" aria-hidden="true"></div>
+        <div class="progress" style="margin-top:12px">
+          <span>Growth: <strong id="growthLabel">Seed</strong></span>
+          <span class="chip">🌱 <span id="growth">0</span></span>
+        </div>
+      </div>
+
+      <div class="bubbles card" id="bubblesArea" aria-labelledby="bubbles-title" role="region">
+        <h2 id="bubbles-title" class="title">Soft bubble pop</h2>
+        <p class="desc">Tap bubbles and read the gentle words that appear. Light, playful focus for busy minds.</p>
+        <div class="row">
+          <button id="release" aria-label="Release bubbles">🫧 Release</button>
+          <button id="clearBubbles" aria-label="Clear bubbles">🧹 Clear</button>
+          <span class="chip">Popped: <strong id="popped">0</strong></span>
+        </div>
+        <div id="bubbles" style="position:relative; height: 220px; margin-top:8px"></div>
+      </div>
+
+      <!-- 30-second grounding -->
+      <div class="card" id="quickGround" aria-labelledby="qg-title" role="region">
+        <h2 id="qg-title" class="title">30-second grounding</h2>
+        <p class="desc">This quick exercise helps you notice what’s around you and feel calmer. A brief 5-4-3-2-1 check-in.</p>
+        <div class="row">
+          <button id="qgStart" class="bar-btn">🧭 Start</button>
+          <button id="qgStop" class="bar-btn" disabled>⏹ Stop</button>
+          <span class="chip"><strong id="qgTime">30</strong>s</span>
+        </div>
+        <div class="ground-screen" id="qgScreen">Press Start to begin a fast grounding round.</div>
+        <div class="progress" style="margin-top:10px">
+          <div class="progress-bar"><span id="qgFill" class="progress-fill"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right column -->
+    <section class="side-right card" aria-labelledby="ground-title">
+      <h2 id="ground-title" class="title">Grounding</h2>
+      <p class="desc">The classic 5-4-3-2-1 check-in anchors you in the present using senses and gratitude.</p>
+      <div class="grounding-area">
+        <div class="ground-row">
+          <button id="groundStart" class="bar-btn">🧭 Start</button>
+          <button id="groundStop" class="bar-btn" disabled>⏹ Stop</button>
+          <span class="ground-pill">Step <strong id="gStep">0</strong>/5</span>
+        </div>
+        <div class="ground-screen" id="groundScreen">Press Start to begin grounding.</div>
+      </div>
+      <hr style="border-color:rgba(255,255,255,.12)">
+      <h3 class="title" style="font-size:16px; margin-top:10px">Notes & options</h3>
+      <p class="desc">• Space toggles breathing. • “Reduce Motion” is respected. • M toggles sound.</p>
+      <div class="row"><button id="reset" class="bar-btn" aria-label="Reset progress">♻ Reset progress</button></div>
+    </section>
+
+    <canvas id="petals"></canvas>
+  </main>
+
+  <footer>
+    Not medical advice. If you’re in immediate danger or thinking of harming yourself, contact local emergency services.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ===== gentle chimes ===== */
+  var audioCtx = null;
+  var soundOn = true;
+  function ensureAudio(){ if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+  function chime(freq, time, type, gain){
+    if (freq===undefined) freq=440; if (time===undefined) time=0.3; if (type===undefined) type='sine'; if (gain===undefined) gain=0.05;
+    if (!soundOn) return;
+    try{
+      var ctx = ensureAudio();
+      var o = ctx.createOscillator(); var g = ctx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(0, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(gain, ctx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + time);
+      o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + time + 0.02);
+    }catch(e){}
+  }
+  function popSound(){ chime(740,0.08,'sine',0.04); setTimeout(function(){ chime(520,0.08,'sine',0.035); },50); }
+
+  /* ===== Elements ===== */
+  var orb = document.getElementById('orb');
+  var cue = document.getElementById('cue');
+  var startBtn = document.getElementById('start');
+  var stopBtn  = document.getElementById('stop');
+  var patternSel = document.getElementById('pattern');
+  var speedRange = document.getElementById('speed');
+  var cyclesEl = document.getElementById('cycles');
+  var goalEl = document.getElementById('goal');
+  var streakEl = document.getElementById('streak');
+  var growthEl = document.getElementById('growth');
+  var growthLabel = document.getElementById('growthLabel');
+  var muteBtn = document.getElementById('mute');
+  var resetBtn = document.getElementById('reset');
+  var cyclesWantedSel = document.getElementById('cyclesWanted');
+  var restartAllBtn = document.getElementById('restartAll');
+
+  var plant = document.querySelector('.plant');
+  var stem = document.getElementById('stem');
+  var bud = document.getElementById('bud');
+
+  var releaseBtn = document.getElementById('release');
+  var clearBubblesBtn = document.getElementById('clearBubbles');
+  var poppedEl = document.getElementById('popped');
+  var bubblesWrap = document.getElementById('bubbles');
+
+  var gStart = document.getElementById('groundStart');
+  var gStop = document.getElementById('groundStop');
+  var gScreen = document.getElementById('groundScreen');
+  var gStepEl = document.getElementById('gStep');
+
+  var qgStart = document.getElementById('qgStart');
+  var qgStop  = document.getElementById('qgStop');
+  var qgScreen = document.getElementById('qgScreen');
+  var qgTimeEl = document.getElementById('qgTime');
+  var qgFill = document.getElementById('qgFill');
+
+  /* ===== State ===== */
+  var cycles = Number(localStorage.getItem('cg_cycles') || 0);
+  var growth = Number(localStorage.getItem('cg_growth') || 0);
+  var popped = Number(localStorage.getItem('cg_popped') || 0);
+  var streak = 0;
+  var running = false;
+  var cancelTimer = null;
+  var currentPattern = (localStorage.getItem('cg_pattern') || patternSel.value);
+
+  cyclesEl.textContent = cycles;
+  growthEl.textContent = growth;
+  poppedEl.textContent = popped;
+  patternSel.value = currentPattern;
+  goalEl.textContent = cyclesWantedSel.value;
+
+  function save(){
+    localStorage.setItem('cg_cycles', cycles);
+    localStorage.setItem('cg_growth', growth);
+    localStorage.setItem('cg_popped', popped);
+    localStorage.setItem('cg_pattern', patternSel.value);
+  }
+
+  function setCue(text){ cue.textContent = text; }
+  function setScale(scale, durSec){
+    orb.style.setProperty('--scale', String(scale));
+    orb.style.setProperty('--dur', String(durSec) + 's');
+  }
+  function parsePattern(pat){
+    var parts = pat.split('-').map(Number);
+    if (parts.length === 3) return {inhale:parts[0], hold:parts[1], exhale:parts[2], hold2:0};
+    if (parts.length === 4) return {inhale:parts[0], hold:parts[1], exhale:parts[2], hold2:parts[3]};
+    return {inhale:4, hold:2, exhale:6, hold2:0};
+  }
+  function growthName(n){
+    if (n < 3) return 'Seed';
+    if (n < 6) return 'Sprout';
+    if (n < 10) return 'Sapling';
+    if (n < 15) return 'Bush';
+    return 'Little tree';
+  }
+  function addLeaf(angleDeg, len){
+    if (len===undefined) len=60;
+    var leaf = document.createElement('span');
+    leaf.className = 'leaf';
+    leaf.style.height = String(Math.max(40, len)) + 'px';
+    leaf.style.transform = 'translate(-50%, 0) rotate(' + angleDeg + 'deg)';
+    leaf.style.left = '50%';
+    leaf.style.bottom = String(40 + Math.random()*60) + 'px';
+    plant.appendChild(leaf);
+    if (!prefersReducedMotion){
+      leaf.animate(
+        [{transform:'translate(-50%,0) rotate(' + (angleDeg-6) + 'deg)'},
+         {transform:'translate(-50%,0) rotate(' + (angleDeg+6) + 'deg)'}],
+        {duration: 3200 + Math.random()*2200, iterations: Infinity, direction:'alternate', easing:'ease-in-out'}
+      );
+    }
+  }
+  function updateGarden(){
+    growthLabel.textContent = growthName(growth);
+    var leaves = plant.querySelectorAll('.leaf');
+    var need = Math.max(0, growth - leaves.length);
+    for(var i=0;i<need;i++){
+      var angle = (i%2===0 ? -40 - Math.random()*25 : 40 + Math.random()*25);
+      addLeaf(angle, 40 + Math.random()*40);
+    }
+    stem.style.height = String(90 + Math.min(growth*4, 120)) + 'px';
+    bud.style.bottom = String(parseInt(stem.style.height,10) - 4) + 'px';
+  }
+  updateGarden();
+
+  /* ===== Breathing loop ===== */
+  function runBreathing(){
+    if (running) return;
+    running = true;
+    startBtn.disabled = true; stopBtn.disabled = false;
+    ensureAudio();
+    var pat = parsePattern(patternSel.value);
+    var speedF = Number(speedRange.value);
+
+    var steps = [
+      {label:'Inhale…', scale:1.35, dur:pat.inhale/speedF, tone:432}
+    ];
+    if (pat.hold) steps.push({label:'Hold…', scale:1.35, dur:pat.hold/speedF, tone:520});
+    steps.push({label:'Exhale…', scale:0.85, dur:pat.exhale/speedF, tone:392});
+    if (pat.hold2) steps.push({label:'Hold…', scale:0.85, dur:pat.hold2/speedF, tone:520});
+
+    var k = 0;
+    function step(){
+      if (!running) return;
+      var s = steps[k];
+      setCue(s.label);
+      setScale(s.scale, s.dur);
+      chime(s.tone, 0.25, 'sine', 0.03);
+      cancelTimer = setTimeout(function(){
+        k = (k+1)%steps.length;
+        if (k===0){
+          cycles++; streak++;
+          cyclesEl.textContent = String(cycles);
+          streakEl.textContent = 'Streak: ' + String(streak);
+          if (streak % 2 === 0){
+            growth++; growthEl.textContent = String(growth); updateGarden();
+            chime(660,0.22,'sine',0.035); setTimeout(function(){ chime(880,0.18,'sine',0.03); },80);
+          }
+          save();
+          var goal = Number(cyclesWantedSel.value);
+          if (goal && cycles % goal === 0) toast('Nice work. Your garden grew!');
+        }
+        step();
+      }, s.dur*1000 + 60);
+    }
+    step();
+  }
+  function stopBreathing(){
+    running = false;
+    startBtn.disabled = false; stopBtn.disabled = true;
+    setCue('Paused');
+    if (cancelTimer) clearTimeout(cancelTimer);
+    streak = 0; streakEl.textContent = 'Streak: 0';
+  }
+  startBtn.addEventListener('click', runBreathing);
+  stopBtn.addEventListener('click', stopBreathing);
+  speedRange.addEventListener('input', function(){ if (running){ stopBreathing(); runBreathing(); }});
+  patternSel.addEventListener('change', function(){ save(); if (running){ stopBreathing(); runBreathing(); }});
+  cyclesWantedSel.addEventListener('change', function(){ goalEl.textContent = cyclesWantedSel.value; });
+  window.addEventListener('keydown', function(e){
+    if (e.code === 'Space'){ e.preventDefault(); if (running) stopBreathing(); else runBreathing(); }
+    else if ((e.key||'').toLowerCase() === 'm'){ toggleSound(); }
+  });
+
+  /* ===== Bubbles ===== */
+  var affirmations = [
+    'You are safe','This will pass','Breathe easy','Gentle is enough','One step at a time',
+    'You matter','Here & now','Soft shoulders','Inhale calm','Exhale worry',
+    'Let it drift','Grounded & present','Slow is okay','Your pace is perfect','Calm grows with practice',
+    'Unclench your jaw','Relax your brow','Feel your feet','Peace on the exhale','Lightness returns',
+    'Calm is within you','Every breath is a reset','Ease flows through you','You are stronger than you think',
+    'One breath at a time',"Release what you can't control",'Peace is possible now','Stillness is strength',
+    'Let your shoulders drop','Feel the air support you','You are enough right now','Quiet is healing',
+    'The present is safe','Trust your rhythm','Balance returns gently'
+  ];
+
+  function releaseBubbles(count){
+    if (count===undefined) count=12;
+    var areaRect = bubblesWrap.getBoundingClientRect();
+    for (var i=0; i<count; i++){
+      var b = document.createElement('div');
+      b.className = 'bubble';
+      var size = 26 + Math.random()*48;
+      var duration = 10000 + Math.random()*5000;
+      b.style.width = String(size) + 'px';
+      b.style.height = String(size) + 'px';
+      b.style.left = String(Math.random() * (areaRect.width - size)) + 'px';
+      b.style.top = String(areaRect.height - size - 5) + 'px';
+      b.style.animationDuration = String(duration) + 'ms';
+      b.setAttribute('aria-label','Bubble'); b.setAttribute('role','button'); b.tabIndex = 0;
+
+      var handlePop = function(ev, el, sz){
+        return function(){
+          el.removeEventListener('click', handlePop);
+          el.removeEventListener('keydown', keyPop);
+          el.style.pointerEvents='none'; el.style.opacity='0';
+          popped++; poppedEl.textContent = String(popped); save();
+          popSound(); if (navigator.vibrate) navigator.vibrate(15);
+          showAffirmation(el.offsetLeft + sz/2, el.offsetTop);
+          el.remove();
+        };
+      }(null, b, size);
+
+      function keyPop(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); handlePop(); } }
+
+      b.addEventListener('click', handlePop);
+      b.addEventListener('keydown', keyPop);
+      bubblesWrap.appendChild(b);
+      setTimeout(function(){ if (document.body.contains(b)) b.remove(); }, duration + 2000);
+    }
+  }
+
+  function showAffirmation(x,y){
+    var a = document.createElement('div');
+    a.className = 'affirm';
+    a.textContent = affirmations[Math.floor(Math.random()*affirmations.length)];
+    bubblesWrap.appendChild(a);
+    a.style.left = String(x) + 'px';
+    a.style.top  = String(y) + 'px';
+    requestAnimationFrame(function(){ a.style.opacity = '1'; a.style.transform = 'translate(-50%, -120%) scale(1)'; });
+    setTimeout(function(){ a.remove(); }, 1800);
+  }
+
+  document.getElementById('release').addEventListener('click', function(){ releaseBubbles(14); });
+  clearBubblesBtn.addEventListener('click', function(){
+    bubblesWrap.querySelectorAll('.bubble,.affirm').forEach(function(el){ el.remove(); });
+  });
+
+  /* ===== Petals background ===== */
+  var canvas = document.getElementById('petals');
+  var ctx = canvas.getContext('2d', {alpha:true});
+  var W=0,H=0, petals=[];
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; if (petals.length===0) spawnPetals(); }
+  function spawnPetals(){
+    var count = prefersReducedMotion ? 8 : 24;
+    petals = Array.from({length: count}).map(function(){ return { x: Math.random()*W, y: Math.random()*H, r: 3 + Math.random()*4, s: .15 + Math.random()*.6, t: Math.random()*Math.PI*2 }; });
+  }
+  function drawPetal(p){
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.sin(p.t)*.6);
+    var g = ctx.createRadialGradient(0,0,0, 0,0,p.r*2);
+    g.addColorStop(0, 'rgba(255,255,255,.8)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(0,0,p.r*.6, p.r*1.4, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<petals.length;i++){
+      var p = petals[i];
+      p.t += 0.008; p.y += p.s * .45; p.x += Math.sin(p.t)*.22;
+      if (p.y > H+20){ p.y = -20; p.x = Math.random()*W; }
+      drawPetal(p);
+    }
+    if (!prefersReducedMotion) requestAnimationFrame(tick);
+  }
+  resize(); window.addEventListener('resize', resize); if (!prefersReducedMotion) requestAnimationFrame(tick);
+
+  /* ===== Grounding (right) ===== */
+  var stepsGround = [
+    'Look around and name <strong>5 things</strong> you can <em>see</em>.',
+    'Gently touch <strong>4 things</strong> you can <em>feel</em>.',
+    'Listen for <strong>3 sounds</strong> you can <em>hear</em>.',
+    'Notice <strong>2 scents</strong> you can <em>smell</em>.',
+    'Name <strong>1 taste or gratitude</strong> you can <em>sense</em>.'
+  ];
+  var gIndex = -1, gTimer = null;
+  function groundRender(){
+    gStepEl.textContent = String(Math.max(0,gIndex+1));
+    gScreen.innerHTML = (gIndex < 0) ? 'Press Start to begin grounding.' : stepsGround[gIndex];
+  }
+  function startGrounding(){
+    ensureAudio(); gIndex = -1; groundRender();
+    gStart.disabled = true; gStop.disabled = false;
+    chime(520,0.18);
+    function advance(){
+      gIndex++;
+      if (gIndex >= stepsGround.length){
+        stopGrounding();
+        toast('Nice job — you’re back here & now.'); chime(640,0.25); setTimeout(function(){ chime(820,0.2); },160);
+        return;
+      }
+      groundRender(); chime(520,0.18);
+    }
+    advance();
+    gTimer = setInterval(advance, 5000);
+  }
+  function stopGrounding(){
+    if (gTimer){ clearInterval(gTimer); gTimer=null; }
+    gStart.disabled = false; gStop.disabled = true;
+    gIndex = -1; groundRender();
+  }
+  gStart.addEventListener('click', startGrounding);
+  gStop.addEventListener('click', stopGrounding);
+
+  /* ===== Quick Grounding: 30s (center) ===== */
+  var qgSteps = [
+    '👀 Name 5 things you can see.',
+    '🤲 Touch 4 things you can feel.',
+    '👂 Hear 3 sounds you can notice.',
+    '👃 Notice 2 scents you can smell.',
+    '💚 Name 1 taste or gratitude.'
+  ];
+  var qgTick = null, qgSeconds = 30, qgIndex = -1;
+  function qgRender(){
+    qgTimeEl.textContent = String(qgSeconds);
+    var pct = ((30 - qgSeconds) / 30) * 100;
+    qgFill.style.width = String(pct) + '%';
+    qgScreen.innerHTML = (qgIndex < 0) ? 'Press Start to begin a fast grounding round.' : qgSteps[qgIndex];
+  }
+  function qgAdvance(){ qgIndex = Math.min(qgIndex + 1, qgSteps.length - 1); qgRender(); chime(520,0.18); }
+  function startQuickGrounding(){
+    if (qgTick) return;
+    ensureAudio();
+    qgSeconds = 30; qgIndex = -1;
+    qgStart.disabled = true; qgStop.disabled = false;
+    toast('Grounding started — look around.'); chime(640,0.22);
+    qgAdvance(); // first step immediately
+    var elapsed = 0;
+    qgTick = setInterval(function(){
+      qgSeconds--; elapsed++; qgRender();
+      if (elapsed % 5 === 0 && qgIndex < qgSteps.length - 1) qgAdvance();
+      if (qgSeconds <= 0) finishQuickGrounding();
+    }, 1000);
+  }
+  function finishQuickGrounding(){
+    stopQuickGrounding();
+    toast('Nice job — you’re back here & now.');
+    chime(640,0.25); setTimeout(function(){ chime(820,0.2); },160);
+  }
+  function stopQuickGrounding(){
+    if (qgTick){ clearInterval(qgTick); qgTick=null; }
+    qgStart.disabled = false; qgStop.disabled = true;
+    qgSeconds = 30; qgIndex = -1; qgRender();
+  }
+  if (qgStart) qgStart.addEventListener('click', startQuickGrounding);
+  if (qgStop)  qgStop.addEventListener('click', stopQuickGrounding);
+  qgRender();
+
+  /* ===== Toast, Sound, Reset, Restart-all ===== */
+  function toast(text){
+    var t = document.createElement('div');
+    t.innerHTML = text;
+    t.style.position='fixed'; t.style.bottom='18px'; t.style.left='50%'; t.style.transform='translateX(-50%)';
+    t.style.padding='10px 14px'; t.style.background='rgba(0,0,0,.55)'; t.style.color='white';
+    t.style.borderRadius='999px'; t.style.boxShadow='0 8px 20px rgba(0,0,0,.25)'; t.style.zIndex='9999'; t.style.fontWeight='700'; t.style.letterSpacing='.3px';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .6s'; t.remove(); }, 2000);
+  }
+  function toggleSound(){
+    soundOn = !soundOn;
+    muteBtn.textContent = soundOn ? '🔊 Sound: On' : '🔇 Sound: Off';
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  }
+  muteBtn.addEventListener('click', toggleSound);
+
+  resetBtn.addEventListener('click', function(){
+    if (confirm('Reset garden & counters?')){
+      cycles = 0; growth = 0; popped = 0; streak = 0;
+      localStorage.removeItem('cg_cycles'); localStorage.removeItem('cg_growth'); localStorage.removeItem('cg_popped');
+      plant.querySelectorAll('.leaf').forEach(function(el){ el.remove(); });
+      updateGarden();
+      cyclesEl.textContent = '0'; growthEl.textContent='0'; poppedEl.textContent='0'; streakEl.textContent = 'Streak: 0';
+      toast('Progress reset');
+    }
+  });
+
+  restartAllBtn.addEventListener('click', function(){
+    if (confirm('Restart everything and start a fresh session?')){
+      try{ localStorage.clear(); }catch(e){}
+      location.reload();
+    }
+  });
+
+  document.body.addEventListener('click', function(){ if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }, {once:true});
+})();
+</script>
+</body>
+</html>
