@@ -62,6 +62,9 @@
   .controls select,.controls button,.controls input[type="range"]{ background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); color:var(--ink); padding:8px 10px; border-radius:10px; cursor:pointer; }
   .controls input[type="range"]{flex:1}
   .pill{display:inline-flex; gap:6px; align-items:center; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); color:var(--ink); padding:6px 10px; border-radius:999px; font-size:13px}
+  textarea{width:100%; min-height:110px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:12px; font:inherit; color:var(--ink); resize:vertical; box-shadow:inset 0 4px 10px rgba(0,0,0,.12);}
+  textarea:focus{outline:none; box-shadow:var(--focus);}
+  .prompt-box{margin-bottom:10px; padding:16px; border-radius:14px; background:rgba(255,255,255,.08); font-weight:600; line-height:1.5; letter-spacing:.2px;}
 
   .garden{position:relative; overflow:hidden; min-height:220px; display:flex; flex-direction:column; gap:8px}
   .soil{ position:absolute; bottom:-20px; left:-20px; right:-20px; height:110px; background: radial-gradient(200px 80px at 50% 0%, rgba(0,0,0,.25), transparent), linear-gradient(#2f3f33, #1d2a21); border-top-left-radius:30px; border-top-right-radius:30px; box-shadow: inset 0 10px 30px rgba(255,255,255,.06); }
@@ -140,6 +143,14 @@
         <label class="pill" for="speed">Speed
           <input id="speed" type="range" min="0.75" max="1.5" step="0.05" value="1" aria-label="Breathing speed" />
         </label>
+        <label class="pill" for="soundscape">Soundscape
+          <select id="soundscape" aria-label="Ambient soundscape">
+            <option value="off">Off</option>
+            <option value="rain">Gentle rain</option>
+            <option value="forest">Forest birds</option>
+            <option value="waves">Ocean waves</option>
+          </select>
+        </label>
       </div>
       <div class="progress" aria-live="polite">
         <span>Cycles: <strong id="cycles">0</strong> / <span id="goal">10</span></span>
@@ -188,6 +199,17 @@
           <div class="progress-bar"><span id="qgFill" class="progress-fill"></span></div>
         </div>
       </div>
+
+      <div class="card" id="reflection" aria-labelledby="reflection-title" role="region">
+        <h2 id="reflection-title" class="title">Gentle reflection</h2>
+        <p class="desc">Capture a soft thought or gratitude to deepen your calm.</p>
+        <div id="reflectionPrompt" class="prompt-box" role="status" aria-live="polite"></div>
+        <textarea id="reflectionNote" aria-label="Reflection note" placeholder="Write a few calming words…"></textarea>
+        <div class="row" style="margin-top:10px">
+          <button id="nextPrompt" class="bar-btn">🔄 Next prompt</button>
+          <button id="saveReflection" class="bar-btn">💾 Save note</button>
+        </div>
+      </div>
     </section>
 
     <!-- Right column -->
@@ -223,6 +245,82 @@
   /* ===== gentle chimes ===== */
   var audioCtx = null;
   var soundOn = true;
+  function createSeededRandom(seed){
+    var v = seed >>> 0;
+    return function(){ v = (v * 1664525 + 1013904223) >>> 0; return v / 4294967296; };
+  }
+  function createWaveData(samples, sampleRate){
+    var frameCount = samples.length;
+    var buffer = new ArrayBuffer(44 + frameCount * 2);
+    var view = new DataView(buffer);
+    var offset = 0;
+    function writeString(str){ for (var i=0;i<str.length;i++){ view.setUint8(offset++, str.charCodeAt(i)); } }
+    function writeUint32(val){ view.setUint32(offset, val, true); offset += 4; }
+    function writeUint16(val){ view.setUint16(offset, val, true); offset += 2; }
+    writeString('RIFF');
+    writeUint32(36 + frameCount * 2);
+    writeString('WAVE');
+    writeString('fmt ');
+    writeUint32(16);
+    writeUint16(1);
+    writeUint16(1);
+    writeUint32(sampleRate);
+    writeUint32(sampleRate * 2);
+    writeUint16(2);
+    writeUint16(16);
+    writeString('data');
+    writeUint32(frameCount * 2);
+    for (var i=0;i<frameCount;i++){
+      var s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s * 32767, true);
+      offset += 2;
+    }
+    var bytes = new Uint8Array(buffer);
+    var binary = '';
+    for (var j=0;j<bytes.length;j+=0x8000){
+      var chunk = bytes.subarray(j, j+0x8000);
+      binary += String.fromCharCode.apply(null, chunk);
+    }
+    return 'data:audio/wav;base64,' + btoa(binary);
+  }
+  function buildSoundscapeData(kind){
+    var sampleRate = 8000;
+    var seconds = kind === 'waves' ? 4 : 2.5;
+    var total = Math.floor(sampleRate * seconds);
+    var data = new Float32Array(total);
+    var rand = createSeededRandom(kind === 'rain' ? 1 : kind === 'forest' ? 2 : 3);
+    var last = 0;
+    for (var i=0;i<total;i++){
+      var t = i / sampleRate;
+      var value = 0;
+      if (kind === 'rain'){
+        last = last * 0.7 + (rand()*2 - 1) * 0.3;
+        var drizzle = (rand()*2 - 1) * 0.15;
+        value = last * 0.55 + drizzle;
+      }else if (kind === 'forest'){
+        var base = Math.sin(2*Math.PI*180*t) * 0.08 + Math.sin(2*Math.PI*220*t) * 0.06;
+        var bird = Math.sin(2*Math.PI*(780 + 160*Math.sin(2*Math.PI*0.45*t))*t) * 0.05;
+        var rustle = (rand()*2 - 1) * 0.04;
+        value = base + bird + rustle;
+      }else{ // waves
+        var swell = Math.sin(2*Math.PI*0.18*t) * 0.5;
+        var foam = Math.sin(2*Math.PI*0.8*t) * 0.18;
+        var ripple = (rand()*2 - 1) * 0.08;
+        value = swell + foam + ripple;
+      }
+      var fadeIn = Math.min(1, i / (sampleRate * 0.25));
+      var fadeOut = Math.min(1, (total - i - 1) / (sampleRate * 0.25));
+      var window = Math.max(0, Math.min(fadeIn, fadeOut));
+      data[i] = value * window;
+    }
+    return createWaveData(data, sampleRate);
+  }
+  var soundscapes = {
+    off: null,
+    rain: buildSoundscapeData('rain'),
+    forest: buildSoundscapeData('forest'),
+    waves: buildSoundscapeData('waves')
+  };
   function ensureAudio(){ if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
   function chime(freq, time, type, gain){
     if (freq===undefined) freq=440; if (time===undefined) time=0.3; if (type===undefined) type='sine'; if (gain===undefined) gain=0.05;
@@ -252,6 +350,7 @@
   var growthEl = document.getElementById('growth');
   var growthLabel = document.getElementById('growthLabel');
   var muteBtn = document.getElementById('mute');
+  var soundscapeSel = document.getElementById('soundscape');
   var resetBtn = document.getElementById('reset');
   var cyclesWantedSel = document.getElementById('cyclesWanted');
   var restartAllBtn = document.getElementById('restartAll');
@@ -276,6 +375,11 @@
   var qgTimeEl = document.getElementById('qgTime');
   var qgFill = document.getElementById('qgFill');
 
+  var reflectionPromptEl = document.getElementById('reflectionPrompt');
+  var reflectionNoteEl = document.getElementById('reflectionNote');
+  var reflectionNextBtn = document.getElementById('nextPrompt');
+  var reflectionSaveBtn = document.getElementById('saveReflection');
+
   /* ===== State ===== */
   var cycles = Number(localStorage.getItem('cg_cycles') || 0);
   var growth = Number(localStorage.getItem('cg_growth') || 0);
@@ -284,18 +388,134 @@
   var running = false;
   var cancelTimer = null;
   var currentPattern = (localStorage.getItem('cg_pattern') || patternSel.value);
+  var currentSoundscapeChoice = (localStorage.getItem('cg_soundscape') || 'off');
+
+  var reflectionPrompts = [
+    'What is one small kindness you can offer yourself right now?',
+    'Name three things in this moment that you feel grateful for.',
+    'What is something gentle you can notice with your senses?',
+    'Write a short mantra you want to carry through the day.',
+    'How does your body feel softer or lighter after pausing?'
+  ];
+  var reflectionIndex = Number(localStorage.getItem('cg_reflection_index') || 0);
+  if (!reflectionPrompts[reflectionIndex]) reflectionIndex = 0;
+  var reflectionNote = localStorage.getItem('cg_reflection_note') || '';
 
   cyclesEl.textContent = cycles;
   growthEl.textContent = growth;
   poppedEl.textContent = popped;
   patternSel.value = currentPattern;
+  soundscapeSel.value = currentSoundscapeChoice;
   goalEl.textContent = cyclesWantedSel.value;
+  if (reflectionNoteEl) reflectionNoteEl.value = reflectionNote;
 
   function save(){
     localStorage.setItem('cg_cycles', cycles);
     localStorage.setItem('cg_growth', growth);
     localStorage.setItem('cg_popped', popped);
     localStorage.setItem('cg_pattern', patternSel.value);
+    if (soundscapeSel) localStorage.setItem('cg_soundscape', soundscapeSel.value);
+  }
+
+  function renderReflectionPrompt(){
+    if (reflectionPromptEl) reflectionPromptEl.innerHTML = reflectionPrompts[reflectionIndex];
+  }
+  function persistReflectionState(){
+    localStorage.setItem('cg_reflection_index', reflectionIndex);
+    if (reflectionNoteEl) localStorage.setItem('cg_reflection_note', reflectionNoteEl.value);
+  }
+  function nextReflectionPrompt(opts){
+    reflectionIndex = (reflectionIndex + 1) % reflectionPrompts.length;
+    renderReflectionPrompt();
+    persistReflectionState();
+    if (!(opts && opts.silent)) toast('New reflection prompt ready.');
+  }
+  function promptReflectionNudge(){
+    if (!reflectionPrompts.length) return;
+    nextReflectionPrompt({silent:true});
+    setTimeout(function(){ toast('Take a quiet moment to jot a reflection.'); }, 2100);
+  }
+  renderReflectionPrompt();
+  if (reflectionNoteEl){
+    reflectionNoteEl.addEventListener('input', function(){
+      localStorage.setItem('cg_reflection_note', reflectionNoteEl.value);
+    });
+  }
+  if (reflectionNextBtn){
+    reflectionNextBtn.addEventListener('click', function(){
+      nextReflectionPrompt();
+      chime(520,0.18,'sine',0.02);
+    });
+  }
+  if (reflectionSaveBtn){
+    reflectionSaveBtn.addEventListener('click', function(){
+      persistReflectionState();
+      toast('Reflection saved.');
+      chime(480,0.18,'sine',0.018);
+    });
+  }
+
+  var soundscapeBuffers = {};
+  var currentSoundscapeSource = null;
+  function stopSoundscape(fadeMs){
+    if (!currentSoundscapeSource || !audioCtx) return;
+    try{
+      var ctx = audioCtx;
+      var gain = currentSoundscapeSource.gain;
+      var now = ctx.currentTime;
+      var dur = (fadeMs || 400) / 1000;
+      if (gain){
+        var current = gain.gain.value;
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(current, now);
+        gain.gain.linearRampToValueAtTime(0.0001, now + dur);
+      }
+      currentSoundscapeSource.source.stop(now + dur + 0.05);
+    }catch(e){ try{ currentSoundscapeSource.source.stop(); }catch(_){} }
+    currentSoundscapeSource = null;
+  }
+  function startSoundscapeBuffer(buffer){
+    if (!buffer) return;
+    var ctx = ensureAudio();
+    var source = ctx.createBufferSource();
+    var gain = ctx.createGain();
+    source.buffer = buffer;
+    source.loop = true;
+    if (buffer.duration > 0.12){
+      source.loopStart = 0.05;
+      source.loopEnd = buffer.duration - 0.05;
+    }
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 1.8);
+    source.connect(gain).connect(ctx.destination);
+    source.start();
+    currentSoundscapeSource = { source: source, gain: gain };
+  }
+  function playSoundscape(value){
+    if (!soundOn){ return; }
+    if (!value || value === 'off'){ stopSoundscape(300); return; }
+    var url = soundscapes[value];
+    if (!url){ stopSoundscape(300); return; }
+    var ctx = ensureAudio();
+    if (ctx.state === 'suspended'){ ctx.resume(); }
+    stopSoundscape(200);
+    if (soundscapeBuffers[value]){ startSoundscapeBuffer(soundscapeBuffers[value]); return; }
+    fetch(url).then(function(resp){ return resp.arrayBuffer(); }).then(function(arr){
+      return ctx.decodeAudioData(arr);
+    }).then(function(buffer){
+      soundscapeBuffers[value] = buffer;
+      startSoundscapeBuffer(buffer);
+    }).catch(function(){});
+  }
+  if (soundscapeSel){
+    soundscapeSel.addEventListener('change', function(){
+      save();
+      if (soundOn) playSoundscape(soundscapeSel.value);
+      else stopSoundscape(200);
+    });
+  }
+  if (soundOn && soundscapeSel && soundscapeSel.value !== 'off'){
+    setTimeout(function(){ playSoundscape(soundscapeSel.value); }, 100);
   }
 
   function setCue(text){ cue.textContent = text; }
@@ -381,7 +601,10 @@
           }
           save();
           var goal = Number(cyclesWantedSel.value);
-          if (goal && cycles % goal === 0) toast('Nice work. Your garden grew!');
+          if (goal && cycles % goal === 0){
+            toast('Nice work. Your garden grew!');
+            promptReflectionNudge();
+          }
         }
         step();
       }, s.dur*1000 + 60);
@@ -567,6 +790,7 @@
     stopQuickGrounding();
     toast('Nice job — you’re back here & now.');
     chime(640,0.25); setTimeout(function(){ chime(820,0.2); },160);
+    promptReflectionNudge();
   }
   function stopQuickGrounding(){
     if (qgTick){ clearInterval(qgTick); qgTick=null; }
@@ -592,7 +816,13 @@
   function toggleSound(){
     soundOn = !soundOn;
     muteBtn.textContent = soundOn ? '🔊 Sound: On' : '🔇 Sound: Off';
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if (soundOn){
+      var ctx = ensureAudio();
+      if (ctx.state === 'suspended') ctx.resume();
+      if (soundscapeSel && soundscapeSel.value !== 'off') playSoundscape(soundscapeSel.value);
+    }else{
+      stopSoundscape(300);
+    }
   }
   muteBtn.addEventListener('click', toggleSound);
 
@@ -614,7 +844,10 @@
     }
   });
 
-  document.body.addEventListener('click', function(){ if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }, {once:true});
+  document.body.addEventListener('click', function(){
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if (soundOn && soundscapeSel && soundscapeSel.value !== 'off') playSoundscape(soundscapeSel.value);
+  }, {once:true});
 })();
 </script>
 </body>
