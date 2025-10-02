@@ -11,6 +11,16 @@
     --ink:#e7f1f6; --muted:#a8b7c6; --accent:#79d0b7; --accent2:#a69cf6; --orb:#8ee6cf;
     --shadow:0 14px 36px rgba(0,0,0,.35); --radius:18px; --focus:0 0 0 3px rgba(166,156,246,.35);
   }
+  body[data-theme="pink"]{
+    --bg1:#240616; --bg2:#43112d; --veil:#ffd9f2cc; --card:#2f1224dd;
+    --ink:#ffeef8; --muted:#f7bcd7; --accent:#ff8fc4; --accent2:#f6a3da; --orb:#ffbfdc;
+    --shadow:0 14px 36px rgba(40,0,40,.35); --focus:0 0 0 3px rgba(255,170,220,.38);
+  }
+  body[data-theme="baby"]{
+    --bg1:#061929; --bg2:#0b2740; --veil:#d9ecffcc; --card:#0b2138dd;
+    --ink:#eaf6ff; --muted:#9cc4e4; --accent:#5bc0f8; --accent2:#7cdcff; --orb:#9cd9ff;
+    --shadow:0 14px 36px rgba(0,20,40,.35); --focus:0 0 0 3px rgba(124,220,255,.38);
+  }
   @media (prefers-color-scheme: light){
     :root{
       --bg1:#e9f0f6; --bg2:#dfeaf2; --veil:#ffffffb8; --card:#f6f9fcdd; --ink:#0f1a24; --muted:#5d6b79;
@@ -32,6 +42,9 @@
     background:linear-gradient(0deg, transparent, var(--card)); backdrop-filter:saturate(1.05) blur(8px);
     border-bottom:1px solid rgba(255,255,255,.06); box-shadow:var(--shadow); z-index:3;
   }
+  header .theme-label{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); padding:6px 10px; border-radius:12px;}
+  header .theme-label select{background:transparent; border:none; color:var(--ink); font:inherit; cursor:pointer; padding:0; appearance:none;}
+  header .theme-label:focus-within{outline:none; box-shadow:var(--focus);}
   header h1{margin:0; font-size:20px; font-weight:800; letter-spacing:.2px}
   .tip{color:var(--muted); font-size:12px}
   .spacer{flex:1}
@@ -110,6 +123,13 @@
   <header>
     <h1>🌿 Calm Garden</h1>
     <div class="tip">Breathe, ground, pop bubbles — and grow a tiny plant.</div>
+    <label class="theme-label" for="themeSelect">Theme
+      <select id="themeSelect" aria-label="Choose a color theme">
+        <option value="default">Evergreen</option>
+        <option value="pink">Blossom (Pink)</option>
+        <option value="baby">Daylight (Baby Blue)</option>
+      </select>
+    </label>
     <div class="spacer"></div>
     <button id="restartAll" class="bar-btn" aria-label="Restart everything">🔄 Restart all</button>
     <button id="mute" class="bar-btn" aria-label="Toggle sound">🔊 Sound: On</button>
@@ -354,6 +374,7 @@
   var resetBtn = document.getElementById('reset');
   var cyclesWantedSel = document.getElementById('cyclesWanted');
   var restartAllBtn = document.getElementById('restartAll');
+  var themeSelect = document.getElementById('themeSelect');
 
   var plant = document.querySelector('.plant');
   var stem = document.getElementById('stem');
@@ -389,6 +410,7 @@
   var cancelTimer = null;
   var currentPattern = (localStorage.getItem('cg_pattern') || patternSel.value);
   var currentSoundscapeChoice = (localStorage.getItem('cg_soundscape') || 'off');
+  var currentThemeChoice = (localStorage.getItem('cg_theme') || 'default');
 
   var reflectionPrompts = [
     'What is one small kindness you can offer yourself right now?',
@@ -408,6 +430,16 @@
   soundscapeSel.value = currentSoundscapeChoice;
   goalEl.textContent = cyclesWantedSel.value;
   if (reflectionNoteEl) reflectionNoteEl.value = reflectionNote;
+  if (themeSelect){ themeSelect.value = currentThemeChoice; }
+
+  function applyTheme(value){
+    if (!value || value === 'default'){
+      document.body.removeAttribute('data-theme');
+    }else{
+      document.body.setAttribute('data-theme', value);
+    }
+  }
+  applyTheme(currentThemeChoice);
 
   function save(){
     localStorage.setItem('cg_cycles', cycles);
@@ -415,6 +447,14 @@
     localStorage.setItem('cg_popped', popped);
     localStorage.setItem('cg_pattern', patternSel.value);
     if (soundscapeSel) localStorage.setItem('cg_soundscape', soundscapeSel.value);
+  }
+
+  if (themeSelect){
+    themeSelect.addEventListener('change', function(){
+      var value = themeSelect.value || 'default';
+      applyTheme(value);
+      localStorage.setItem('cg_theme', value);
+    });
   }
 
   function renderReflectionPrompt(){
