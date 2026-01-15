@@ -5,41 +5,107 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Calm Garden — breathe, ground, and grow</title>
 <meta name="description" content="A tiny soothing game to help you breathe, ground, and pass the time.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg1:#0f1720; --bg2:#122233; --veil:#c7d7e6cc; --card:#0f1824cc;
-    --ink:#e7f1f6; --muted:#a8b7c6; --accent:#79d0b7; --accent2:#a69cf6; --orb:#8ee6cf;
-    --accent-glow:#79d0b742; --accent2-glow:#a69cf640; --veil-glow:#e7f1f610;
-    --shadow:0 14px 36px rgba(0,0,0,.35); --radius:18px; --focus:0 0 0 3px rgba(166,156,246,.35);
+    --bg1:#090f18;
+    --bg2:#151b2d;
+    --bg3:#1f2f49;
+    --veil:#d6e6f5cc;
+    --card:#0f1927cc;
+    --ink:#eef6ff;
+    --muted:#a7bbcf;
+    --accent:#7de3c1;
+    --accent2:#8db3ff;
+    --orb:#9fead4;
+    --accent-glow:#7de3c148;
+    --accent2-glow:#8db3ff40;
+    --veil-glow:#eef6ff10;
+    --edge:rgba(255,255,255,.22);
+    --glass:rgba(255,255,255,.08);
+    --glass-strong:rgba(255,255,255,.14);
+    --shadow:0 18px 42px rgba(0,0,0,.35);
+    --radius:20px;
+    --focus:0 0 0 3px rgba(141,179,255,.35);
   }
   body[data-theme="pink"]{
-    --bg1:#240616; --bg2:#43112d; --veil:#ffd9f2cc; --card:#2f1224dd;
-    --ink:#ffeef8; --muted:#f7bcd7; --accent:#ff8fc4; --accent2:#f6a3da; --orb:#ffbfdc;
-    --accent-glow:#ff8fc44a; --accent2-glow:#f6a3da3f; --veil-glow:#ffd9f211;
-    --shadow:0 14px 36px rgba(40,0,40,.35); --focus:0 0 0 3px rgba(255,170,220,.38);
+    --bg1:#240715;
+    --bg2:#3b0f27;
+    --bg3:#5b1d3b;
+    --veil:#ffd8efcc;
+    --card:#2b1021dd;
+    --ink:#fff2fa;
+    --muted:#f5bad7;
+    --accent:#ff8ec1;
+    --accent2:#f4a6df;
+    --orb:#ffd0e8;
+    --accent-glow:#ff8ec14a;
+    --accent2-glow:#f4a6df3f;
+    --veil-glow:#ffd8ef12;
+    --edge:rgba(255,255,255,.26);
+    --glass:rgba(255,255,255,.1);
+    --glass-strong:rgba(255,255,255,.18);
+    --shadow:0 18px 42px rgba(40,0,40,.35);
+    --focus:0 0 0 3px rgba(255,170,220,.4);
   }
   body[data-theme="baby"]{
-    --bg1:#061929; --bg2:#0b2740; --veil:#d9ecffcc; --card:#0b2138dd;
-    --ink:#eaf6ff; --muted:#9cc4e4; --accent:#5bc0f8; --accent2:#7cdcff; --orb:#9cd9ff;
-    --accent-glow:#5bc0f84a; --accent2-glow:#7cdcff42; --veil-glow:#d9ecff12;
-    --shadow:0 14px 36px rgba(0,20,40,.35); --focus:0 0 0 3px rgba(124,220,255,.38);
+    --bg1:#051625;
+    --bg2:#0b243b;
+    --bg3:#123552;
+    --veil:#d9ecffcc;
+    --card:#0b2138dd;
+    --ink:#eaf6ff;
+    --muted:#9cc4e4;
+    --accent:#5bc0f8;
+    --accent2:#7cdcff;
+    --orb:#9cd9ff;
+    --accent-glow:#5bc0f84a;
+    --accent2-glow:#7cdcff42;
+    --veil-glow:#d9ecff12;
+    --edge:rgba(255,255,255,.24);
+    --glass:rgba(255,255,255,.08);
+    --glass-strong:rgba(255,255,255,.16);
+    --shadow:0 18px 42px rgba(0,20,40,.35);
+    --focus:0 0 0 3px rgba(124,220,255,.38);
   }
   @media (prefers-color-scheme: light){
     :root{
-      --bg1:#e9f0f6; --bg2:#dfeaf2; --veil:#ffffffb8; --card:#f6f9fcdd; --ink:#0f1a24; --muted:#5d6b79;
-      --accent:#5fbf8f; --accent2:#7fa2ff; --orb:#96e1c2;
-      --accent-glow:#5fbf8f45; --accent2-glow:#7fa2ff40; --veil-glow:#ffffff10;
-      --shadow:0 10px 28px rgba(18,40,60,.12); --focus:0 0 0 3px rgba(127,162,255,.30);
+      --bg1:#eef3f8;
+      --bg2:#e2ebf4;
+      --bg3:#d8e6f4;
+      --veil:#ffffffb8;
+      --card:#f6f9fcdd;
+      --ink:#0f1a24;
+      --muted:#5d6b79;
+      --accent:#51b88c;
+      --accent2:#6c92f6;
+      --orb:#92e0c1;
+      --accent-glow:#51b88c35;
+      --accent2-glow:#6c92f640;
+      --veil-glow:#ffffff10;
+      --edge:rgba(15,26,36,.12);
+      --glass:rgba(255,255,255,.65);
+      --glass-strong:rgba(255,255,255,.85);
+      --shadow:0 12px 28px rgba(18,40,60,.12);
+      --focus:0 0 0 3px rgba(108,146,246,.26);
     }
   }
   *{box-sizing:border-box}
   html,body{min-height:100%}
   body{
-    margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    line-height:1.55;
+    margin:0;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    line-height:1.6;
     color:var(--ink);
-    background: radial-gradient(1200px 800px at 70% -10%, var(--bg2), var(--bg1) 60%);
-    overflow:auto; -webkit-overflow-scrolling:touch; touch-action:pan-y; scroll-behavior:smooth;
+    background:
+      radial-gradient(900px 600px at 80% -10%, var(--bg3), transparent 60%),
+      radial-gradient(1200px 900px at 20% 10%, var(--bg2), var(--bg1) 60%);
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    scroll-behavior:smooth;
     position:relative;
   }
   body::before{
@@ -48,7 +114,7 @@
       radial-gradient(620px 480px at 18% 18%, var(--accent-glow), transparent 70%),
       radial-gradient(720px 560px at 82% 12%, var(--accent2-glow), transparent 72%),
       radial-gradient(680px 520px at 60% 92%, rgba(255,255,255,.06), transparent 76%);
-    filter:blur(.3px);
+    filter:blur(1px);
     animation: auroraDrift 28s ease-in-out infinite alternate;
     will-change:transform;
   }
@@ -63,23 +129,30 @@
   .wrap{min-height:100%; display:grid; grid-template-rows:auto 1fr auto; position:relative; z-index:1; padding-bottom:40px}
   header{
     display:flex; align-items:center; gap:14px; padding:18px 22px;
-    background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(0,0,0,.25)), var(--card);
+    background:
+      linear-gradient(145deg, rgba(255,255,255,.16), rgba(0,0,0,.32)),
+      var(--card);
     backdrop-filter:saturate(1.12) blur(14px);
-    border:1px solid rgba(255,255,255,.14); box-shadow:var(--shadow);
+    border:1px solid var(--edge);
+    box-shadow:var(--shadow);
     border-radius:calc(var(--radius) + 8px);
     margin:26px auto 0; width:min(1100px, calc(100% - 32px));
     position:sticky; top:18px; z-index:4; flex-wrap:wrap;
   }
-  header::after{content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(120deg, rgba(255,255,255,.12), transparent 65%); opacity:.35;}
+  header::after{
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(120deg, rgba(255,255,255,.18), transparent 65%);
+    opacity:.4;
+  }
   header > *{position:relative; z-index:1}
-  header .theme-label{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); padding:6px 12px; border-radius:14px;}
+  header .theme-label{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); background:var(--glass); border:1px solid var(--edge); padding:6px 12px; border-radius:14px;}
   header .theme-label select{background:transparent; border:none; color:var(--ink); font:inherit; cursor:pointer; padding:0; appearance:none;}
   header .theme-label:focus-within{outline:none; box-shadow:var(--focus);}
-  header h1{margin:0; font-size:24px; font-weight:800; letter-spacing:.4px}
+  header h1{margin:0; font-size:clamp(22px, 2.5vw, 28px); font-weight:800; letter-spacing:.4px}
   header .tip{flex:1 1 240px; max-width:360px; font-size:14px; color:var(--muted); margin-right:auto}
   .tip{color:var(--muted); font-size:12px}
   .spacer{display:none}
-  .bar-btn{ background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); color:var(--ink); padding:8px 14px; border-radius:12px; cursor:pointer; transition:background .3s ease, border-color .3s ease, transform .3s ease, box-shadow .3s ease; }
+  .bar-btn{ background:linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); border:1px solid var(--edge); color:var(--ink); padding:8px 14px; border-radius:12px; cursor:pointer; transition:background .3s ease, border-color .3s ease, transform .3s ease, box-shadow .3s ease; }
   .bar-btn:focus-visible{outline:none; box-shadow:var(--focus)}
   .bar-btn:focus{outline:none}
   @media (hover:hover){
@@ -88,10 +161,10 @@
   main{display:grid; grid-template-columns: 320px 1fr 320px; gap:22px; padding:32px; position:relative; z-index:2;
         width:min(1150px, calc(100% - 32px)); margin:18px auto 0;
         border-radius:calc(var(--radius) + 12px);
-        background:linear-gradient(145deg, rgba(255,255,255,.08), rgba(0,0,0,.18)), var(--card);
-        border:1px solid rgba(255,255,255,.12);
-        box-shadow:0 24px 46px rgba(0,0,0,.35);
-        backdrop-filter:blur(22px) saturate(1.1);
+        background:linear-gradient(145deg, rgba(255,255,255,.12), rgba(0,0,0,.22)), var(--card);
+        border:1px solid var(--edge);
+        box-shadow:0 30px 60px rgba(0,0,0,.38);
+        backdrop-filter:blur(24px) saturate(1.2);
   }
   @media (max-width:1100px){
     main{grid-template-columns: 320px 1fr; padding:28px; width:min(960px, calc(100% - 32px));}
@@ -110,10 +183,13 @@
   }
 
   .card{
-    position:relative; background:var(--card); border:1px solid rgba(255,255,255,.1);
-    border-radius:var(--radius); padding:18px;
-    box-shadow:0 18px 40px rgba(0,0,0,.34);
-    backdrop-filter: blur(10px) saturate(1.05);
+    position:relative;
+    background:linear-gradient(150deg, rgba(255,255,255,.1), rgba(0,0,0,.2)), var(--card);
+    border:1px solid var(--edge);
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:0 20px 44px rgba(0,0,0,.36);
+    backdrop-filter: blur(14px) saturate(1.1);
     overflow:hidden;
     transition: transform .45s ease, box-shadow .45s ease, border-color .45s ease;
   }
@@ -137,7 +213,7 @@
   .title{font-weight:800; margin:0 0 6px 0; letter-spacing:.2px}
   .desc{color:var(--muted); font-size:13px; margin:0 0 10px 0}
 
-  .orb-wrap{ display:grid; place-items:center; height:min(54vh,470px); position:relative; overflow:hidden; border-radius:var(--radius); background: radial-gradient(320px 260px at 60% 30%, var(--veil), transparent 70%); }
+  .orb-wrap{ display:grid; place-items:center; height:min(54vh,470px); position:relative; overflow:hidden; border-radius:var(--radius); background: radial-gradient(340px 280px at 60% 25%, var(--veil), transparent 70%); }
   .orb-wrap.card{padding:0}
   .orb-wrap.card::before{display:none}
   .orb{
@@ -145,16 +221,16 @@
     background:
       radial-gradient(circle at 35% 35%, var(--orb), rgba(255,255,255,.28) 38%, rgba(255,255,255,.08) 58%),
       radial-gradient(circle at 50% 50%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);
-    box-shadow:0 24px 40px rgba(0,0,0,.30), inset 0 0 80px rgba(255,255,255,.22);
+    box-shadow:0 28px 48px rgba(0,0,0,.32), inset 0 0 90px rgba(255,255,255,.22);
     transform: scale(var(--scale,1));
     transition: transform var(--dur,4s) ease-in-out, filter .6s ease;
     will-change: transform;
   }
-  .cue{ position:absolute; bottom:14px; left:50%; transform:translateX(-50%); font-size:16px; font-weight:700; letter-spacing:.4px; background: rgba(0,0,0,.28); padding:8px 12px; border-radius:999px }
+  .cue{ position:absolute; bottom:14px; left:50%; transform:translateX(-50%); font-size:16px; font-weight:700; letter-spacing:.4px; background: rgba(0,0,0,.35); padding:8px 14px; border-radius:999px }
 
   .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
   .controls select,.controls button,.controls input[type="range"]{
-    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14);
+    background:var(--glass); border:1px solid var(--edge);
     color:var(--ink); padding:8px 10px; border-radius:10px;
     transition:background .3s ease, border-color .3s ease, box-shadow .3s ease, transform .3s ease;
   }
@@ -165,21 +241,21 @@
   @media (hover:hover){
     .controls button:hover,.controls select:hover{background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.24)}
   }
-  .pill{display:inline-flex; gap:6px; align-items:center; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); color:var(--ink); padding:6px 10px; border-radius:999px; font-size:13px; transition:background .3s ease, border-color .3s ease;}
+  .pill{display:inline-flex; gap:6px; align-items:center; background:var(--glass); border:1px solid var(--edge); color:var(--ink); padding:6px 10px; border-radius:999px; font-size:13px; transition:background .3s ease, border-color .3s ease;}
   @media (hover:hover){ .pill:hover{background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.24);} }
-  textarea{width:100%; min-height:110px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:12px; font:inherit; color:var(--ink); resize:vertical; box-shadow:inset 0 4px 10px rgba(0,0,0,.12); transition:border-color .3s ease, box-shadow .3s ease;}
+  textarea{width:100%; min-height:110px; background:rgba(255,255,255,.08); border:1px solid var(--edge); border-radius:14px; padding:12px; font:inherit; color:var(--ink); resize:vertical; box-shadow:inset 0 4px 12px rgba(0,0,0,.18); transition:border-color .3s ease, box-shadow .3s ease;}
   textarea:focus-visible{outline:none; box-shadow:var(--focus); border-color:rgba(255,255,255,.28);}
   .prompt-box{margin-bottom:10px; padding:16px; border-radius:14px; background:rgba(255,255,255,.08); font-weight:600; line-height:1.5; letter-spacing:.2px;}
 
   .garden{position:relative; overflow:hidden; min-height:220px; display:flex; flex-direction:column; gap:8px}
-  .soil{ position:absolute; bottom:-20px; left:-20px; right:-20px; height:110px; background: radial-gradient(200px 80px at 50% 0%, rgba(0,0,0,.25), transparent), linear-gradient(#2f3f33, #1d2a21); border-top-left-radius:30px; border-top-right-radius:30px; box-shadow: inset 0 10px 30px rgba(255,255,255,.06); }
+  .soil{ position:absolute; bottom:-20px; left:-20px; right:-20px; height:110px; background: radial-gradient(200px 80px at 50% 0%, rgba(0,0,0,.25), transparent), linear-gradient(#32463a, #1b2a22); border-top-left-radius:30px; border-top-right-radius:30px; box-shadow: inset 0 10px 30px rgba(255,255,255,.08); }
   .plant{position:absolute; bottom:76px; left:50%; transform:translateX(-50%); width:240px; height:240px; pointer-events:none; opacity:.95}
   .bud,.leaf{position:absolute; background:linear-gradient(180deg, #85dfb0, #2f7a48); border-radius:120px 120px 0 120px; transform-origin:bottom center; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35))}
   .bud{width:18px;height:18px; left:50%; transform:translateX(-50%) rotate(45deg)}
   .leaf{width:22px;height:60px; border-radius:60px 60px 0 60px}
   .stem{position:absolute; left:50%; transform:translateX(-50%); bottom:0; width:6px; height:120px; background:linear-gradient(#3b925e, #215238); border-radius:999px}
-  .progress{display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:12px; background:rgba(255,255,255,.08); font-size:14px}
-  .chip{padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.12)}
+  .progress{display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:12px; background:var(--glass); font-size:14px}
+  .chip{padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.12); border:1px solid var(--edge)}
 
   .bubbles{position:relative; min-height:260px; overflow:hidden; border-radius:var(--radius);
            background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));}
@@ -199,20 +275,20 @@
 
   .grounding-area{min-height:220px}
   .ground-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-  .ground-pill{display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.10);
-               border:1px solid rgba(255,255,255,.12); border-radius:999px; padding:6px 10px; font-size:13px}
-  .ground-screen{ margin-top:10px; padding:18px; border-radius:14px; background:rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; text-align:center; min-height:120px; font-weight:700; letter-spacing:.3px }
+  .ground-pill{display:inline-flex; align-items:center; gap:8px; background:var(--glass);
+               border:1px solid var(--edge); border-radius:999px; padding:6px 10px; font-size:13px}
+  .ground-screen{ margin-top:10px; padding:18px; border-radius:14px; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; text-align:center; min-height:120px; font-weight:700; letter-spacing:.3px }
 
   /* 30s grounding progress */
-  .progress-bar{ position:relative; height:10px; width:100%; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); border-radius:999px; overflow:hidden; }
+  .progress-bar{ position:relative; height:10px; width:100%; background:rgba(255,255,255,.08); border:1px solid var(--edge); border-radius:999px; overflow:hidden; }
   .progress-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent2)); box-shadow: inset 0 0 8px rgba(0,0,0,.2); transition: width .25s ease; }
 
   canvas#petals{ position:absolute; inset:0; z-index:1; pointer-events:none; }
   .site-footer{
     width:min(1100px, calc(100% - 32px));
     margin:26px auto 40px;
-    background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(0,0,0,.2)), var(--card);
-    border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(0,0,0,.2)), var(--card);
+    border:1px solid var(--edge);
     border-radius:calc(var(--radius) + 10px);
     box-shadow:0 20px 42px rgba(0,0,0,.34);
     backdrop-filter:blur(18px) saturate(1.08);
@@ -522,6 +598,7 @@
   var currentPattern = (localStorage.getItem('cg_pattern') || patternSel.value);
   var currentSoundscapeChoice = (localStorage.getItem('cg_soundscape') || 'off');
   var currentThemeChoice = (localStorage.getItem('cg_theme') || 'default');
+  var currentGoal = (localStorage.getItem('cg_goal') || cyclesWantedSel.value);
 
   var reflectionPrompts = [
     'What is one small kindness you can offer yourself right now?',
@@ -539,6 +616,7 @@
   poppedEl.textContent = popped;
   patternSel.value = currentPattern;
   soundscapeSel.value = currentSoundscapeChoice;
+  cyclesWantedSel.value = currentGoal;
   goalEl.textContent = cyclesWantedSel.value;
   if (reflectionNoteEl) reflectionNoteEl.value = reflectionNote;
   if (themeSelect){ themeSelect.value = currentThemeChoice; }
@@ -557,6 +635,7 @@
     localStorage.setItem('cg_growth', growth);
     localStorage.setItem('cg_popped', popped);
     localStorage.setItem('cg_pattern', patternSel.value);
+    localStorage.setItem('cg_goal', cyclesWantedSel.value);
     if (soundscapeSel) localStorage.setItem('cg_soundscape', soundscapeSel.value);
   }
 
@@ -773,7 +852,10 @@
   stopBtn.addEventListener('click', stopBreathing);
   speedRange.addEventListener('input', function(){ if (running){ stopBreathing(); runBreathing(); }});
   patternSel.addEventListener('change', function(){ save(); if (running){ stopBreathing(); runBreathing(); }});
-  cyclesWantedSel.addEventListener('change', function(){ goalEl.textContent = cyclesWantedSel.value; });
+  cyclesWantedSel.addEventListener('change', function(){
+    goalEl.textContent = cyclesWantedSel.value;
+    localStorage.setItem('cg_goal', cyclesWantedSel.value);
+  });
   window.addEventListener('keydown', function(e){
     if (e.code === 'Space'){ e.preventDefault(); if (running) stopBreathing(); else runBreathing(); }
     else if ((e.key||'').toLowerCase() === 'm'){ toggleSound(); }
