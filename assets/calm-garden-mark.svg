@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Calm Garden</title>
+  <desc id="desc">A small plant growing beneath a moon.</desc>
+  <rect width="64" height="64" rx="18" fill="#173c32"/>
+  <circle cx="45" cy="18" r="8" fill="#d8eadc" opacity=".92"/>
+  <path d="M32 49V28" stroke="#b7dfc2" stroke-width="4" stroke-linecap="round"/>
+  <path d="M31 37c-9-1-13-6-13-13 8 0 13 4 14 12" fill="#7dbb8d"/>
+  <path d="M33 31c8-1 12-5 12-12-8 0-12 4-13 11" fill="#9ccaa7"/>
+  <path d="M19 50c7-6 19-6 27 0" stroke="#d2b38c" stroke-width="4" stroke-linecap="round"/>
+</svg>
