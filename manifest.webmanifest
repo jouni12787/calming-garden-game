@@ -1,0 +1,18 @@
+{
+  "name": "Calm Garden",
+  "short_name": "Calm Garden",
+  "description": "Private breathing, grounding, reflection, and gentle focus exercises.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0d211c",
+  "theme_color": "#173c32",
+  "icons": [
+    {
+      "src": "assets/calm-garden-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
