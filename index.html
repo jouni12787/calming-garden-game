@@ -1,1087 +1,301 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Calm Garden — breathe, ground, and grow</title>
-<meta name="description" content="A tiny soothing game to help you breathe, ground, and pass the time.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg1:#090f18;
-    --bg2:#151b2d;
-    --bg3:#1f2f49;
-    --veil:#d6e6f5cc;
-    --card:#0f1927cc;
-    --ink:#eef6ff;
-    --muted:#a7bbcf;
-    --accent:#7de3c1;
-    --accent2:#8db3ff;
-    --orb:#9fead4;
-    --accent-glow:#7de3c148;
-    --accent2-glow:#8db3ff40;
-    --veil-glow:#eef6ff10;
-    --edge:rgba(255,255,255,.22);
-    --glass:rgba(255,255,255,.08);
-    --glass-strong:rgba(255,255,255,.14);
-    --shadow:0 18px 42px rgba(0,0,0,.35);
-    --radius:20px;
-    --focus:0 0 0 3px rgba(141,179,255,.35);
-  }
-  body[data-theme="pink"]{
-    --bg1:#240715;
-    --bg2:#3b0f27;
-    --bg3:#5b1d3b;
-    --veil:#ffd8efcc;
-    --card:#2b1021dd;
-    --ink:#fff2fa;
-    --muted:#f5bad7;
-    --accent:#ff8ec1;
-    --accent2:#f4a6df;
-    --orb:#ffd0e8;
-    --accent-glow:#ff8ec14a;
-    --accent2-glow:#f4a6df3f;
-    --veil-glow:#ffd8ef12;
-    --edge:rgba(255,255,255,.26);
-    --glass:rgba(255,255,255,.1);
-    --glass-strong:rgba(255,255,255,.18);
-    --shadow:0 18px 42px rgba(40,0,40,.35);
-    --focus:0 0 0 3px rgba(255,170,220,.4);
-  }
-  body[data-theme="baby"]{
-    --bg1:#051625;
-    --bg2:#0b243b;
-    --bg3:#123552;
-    --veil:#d9ecffcc;
-    --card:#0b2138dd;
-    --ink:#eaf6ff;
-    --muted:#9cc4e4;
-    --accent:#5bc0f8;
-    --accent2:#7cdcff;
-    --orb:#9cd9ff;
-    --accent-glow:#5bc0f84a;
-    --accent2-glow:#7cdcff42;
-    --veil-glow:#d9ecff12;
-    --edge:rgba(255,255,255,.24);
-    --glass:rgba(255,255,255,.08);
-    --glass-strong:rgba(255,255,255,.16);
-    --shadow:0 18px 42px rgba(0,20,40,.35);
-    --focus:0 0 0 3px rgba(124,220,255,.38);
-  }
-  @media (prefers-color-scheme: light){
-    :root{
-      --bg1:#eef3f8;
-      --bg2:#e2ebf4;
-      --bg3:#d8e6f4;
-      --veil:#ffffffb8;
-      --card:#f6f9fcdd;
-      --ink:#0f1a24;
-      --muted:#5d6b79;
-      --accent:#51b88c;
-      --accent2:#6c92f6;
-      --orb:#92e0c1;
-      --accent-glow:#51b88c35;
-      --accent2-glow:#6c92f640;
-      --veil-glow:#ffffff10;
-      --edge:rgba(15,26,36,.12);
-      --glass:rgba(255,255,255,.65);
-      --glass-strong:rgba(255,255,255,.85);
-      --shadow:0 12px 28px rgba(18,40,60,.12);
-      --focus:0 0 0 3px rgba(108,146,246,.26);
-    }
-  }
-  *{box-sizing:border-box}
-  html,body{min-height:100%}
-  body{
-    margin:0;
-    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    line-height:1.6;
-    color:var(--ink);
-    background:
-      radial-gradient(900px 600px at 80% -10%, var(--bg3), transparent 60%),
-      radial-gradient(1200px 900px at 20% 10%, var(--bg2), var(--bg1) 60%);
-    overflow:auto;
-    -webkit-overflow-scrolling:touch;
-    touch-action:pan-y;
-    scroll-behavior:smooth;
-    position:relative;
-  }
-  body::before{
-    content:""; position:fixed; inset:-140px; pointer-events:none; z-index:0;
-    background:
-      radial-gradient(620px 480px at 18% 18%, var(--accent-glow), transparent 70%),
-      radial-gradient(720px 560px at 82% 12%, var(--accent2-glow), transparent 72%),
-      radial-gradient(680px 520px at 60% 92%, rgba(255,255,255,.06), transparent 76%);
-    filter:blur(1px);
-    animation: auroraDrift 28s ease-in-out infinite alternate;
-    will-change:transform;
-  }
-  body::after{
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-    background-image: radial-gradient(circle at center, var(--veil-glow) 0, transparent 70%);
-    background-size: 120px 120px;
-    mix-blend-mode:soft-light;
-    opacity:.55;
-  }
-  a{color:var(--accent2)}
-  .wrap{min-height:100%; display:grid; grid-template-rows:auto 1fr auto; position:relative; z-index:1; padding-bottom:40px}
-  header{
-    display:flex; align-items:center; gap:14px; padding:18px 22px;
-    background:
-      linear-gradient(145deg, rgba(255,255,255,.16), rgba(0,0,0,.32)),
-      var(--card);
-    backdrop-filter:saturate(1.12) blur(14px);
-    border:1px solid var(--edge);
-    box-shadow:var(--shadow);
-    border-radius:calc(var(--radius) + 8px);
-    margin:26px auto 0; width:min(1100px, calc(100% - 32px));
-    position:sticky; top:18px; z-index:4; flex-wrap:wrap;
-  }
-  header::after{
-    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-    background:linear-gradient(120deg, rgba(255,255,255,.18), transparent 65%);
-    opacity:.4;
-  }
-  header > *{position:relative; z-index:1}
-  header .theme-label{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); background:var(--glass); border:1px solid var(--edge); padding:6px 12px; border-radius:14px;}
-  header .theme-label select{background:transparent; border:none; color:var(--ink); font:inherit; cursor:pointer; padding:0; appearance:none;}
-  header .theme-label:focus-within{outline:none; box-shadow:var(--focus);}
-  header h1{margin:0; font-size:clamp(22px, 2.5vw, 28px); font-weight:800; letter-spacing:.4px}
-  header .tip{flex:1 1 240px; max-width:360px; font-size:14px; color:var(--muted); margin-right:auto}
-  .tip{color:var(--muted); font-size:12px}
-  .spacer{display:none}
-  .bar-btn{ background:linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); border:1px solid var(--edge); color:var(--ink); padding:8px 14px; border-radius:12px; cursor:pointer; transition:background .3s ease, border-color .3s ease, transform .3s ease, box-shadow .3s ease; }
-  .bar-btn:focus-visible{outline:none; box-shadow:var(--focus)}
-  .bar-btn:focus{outline:none}
-  @media (hover:hover){
-    .bar-btn:hover{background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.24); transform:translateY(-1px); box-shadow:0 16px 32px rgba(0,0,0,.28);}
-  }
-  main{display:grid; grid-template-columns: 320px 1fr 320px; gap:22px; padding:32px; position:relative; z-index:2;
-        width:min(1150px, calc(100% - 32px)); margin:18px auto 0;
-        border-radius:calc(var(--radius) + 12px);
-        background:linear-gradient(145deg, rgba(255,255,255,.12), rgba(0,0,0,.22)), var(--card);
-        border:1px solid var(--edge);
-        box-shadow:0 30px 60px rgba(0,0,0,.38);
-        backdrop-filter:blur(24px) saturate(1.2);
-  }
-  @media (max-width:1100px){
-    main{grid-template-columns: 320px 1fr; padding:28px; width:min(960px, calc(100% - 32px));}
-    .side-right{display:none}
-  }
-  @media (max-width:900px){
-    main{grid-template-columns:1fr; gap:24px; padding:26px; width:min(780px, calc(100% - 32px));}
-  }
-  @media (max-width:760px){
-    header{position:relative; top:auto; margin-top:18px; padding:16px;}
-    header .tip{order:3; flex:1 1 100%; margin-right:0;}
-    main{grid-template-columns:1fr; padding:20px 18px; margin-top:14px; width:calc(100% - 24px);}
-    .side-left{order:2}
-    .center{order:1}
-    .site-footer{width:calc(100% - 24px); margin:24px auto 32px; padding:18px;}
-  }
-
-  .card{
-    position:relative;
-    background:linear-gradient(150deg, rgba(255,255,255,.1), rgba(0,0,0,.2)), var(--card);
-    border:1px solid var(--edge);
-    border-radius:var(--radius);
-    padding:18px;
-    box-shadow:0 20px 44px rgba(0,0,0,.36);
-    backdrop-filter: blur(14px) saturate(1.1);
-    overflow:hidden;
-    transition: transform .45s ease, box-shadow .45s ease, border-color .45s ease;
-  }
-  .card::before{
-    content:""; position:absolute; inset:0; pointer-events:none;
-    background:linear-gradient(140deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%);
-    opacity:0; transition:opacity .45s ease;
-  }
-  .card > *{position:relative; z-index:1}
-  @media (hover:hover){
-    .card:hover{transform:translateY(-6px); box-shadow:0 26px 52px rgba(0,0,0,.38); border-color:rgba(255,255,255,.24);}
-    .card:hover::before{opacity:.55;}
-  }
-  @media (prefers-reduced-motion: reduce){
-    body{scroll-behavior:auto;}
-    body::before{animation:none;}
-    .card,.bar-btn,.controls select,.controls button,.controls input[type="range"],.pill,textarea{transition:none !important;}
-    .card:hover{transform:none; box-shadow:0 18px 40px rgba(0,0,0,.34);}
-    .bar-btn:hover{transform:none;}
-  }
-  .title{font-weight:800; margin:0 0 6px 0; letter-spacing:.2px}
-  .desc{color:var(--muted); font-size:13px; margin:0 0 10px 0}
-
-  .orb-wrap{ display:grid; place-items:center; height:min(54vh,470px); position:relative; overflow:hidden; border-radius:var(--radius); background: radial-gradient(340px 280px at 60% 25%, var(--veil), transparent 70%); }
-  .orb-wrap.card{padding:0}
-  .orb-wrap.card::before{display:none}
-  .orb{
-    width:200px; height:200px; border-radius:50%;
-    background:
-      radial-gradient(circle at 35% 35%, var(--orb), rgba(255,255,255,.28) 38%, rgba(255,255,255,.08) 58%),
-      radial-gradient(circle at 50% 50%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);
-    box-shadow:0 28px 48px rgba(0,0,0,.32), inset 0 0 90px rgba(255,255,255,.22);
-    transform: scale(var(--scale,1));
-    transition: transform var(--dur,4s) ease-in-out, filter .6s ease;
-    will-change: transform;
-  }
-  .cue{ position:absolute; bottom:14px; left:50%; transform:translateX(-50%); font-size:16px; font-weight:700; letter-spacing:.4px; background: rgba(0,0,0,.35); padding:8px 14px; border-radius:999px }
-
-  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .controls select,.controls button,.controls input[type="range"]{
-    background:var(--glass); border:1px solid var(--edge);
-    color:var(--ink); padding:8px 10px; border-radius:10px;
-    transition:background .3s ease, border-color .3s ease, box-shadow .3s ease, transform .3s ease;
-  }
-  .controls button{cursor:pointer}
-  .controls select{cursor:pointer}
-  .controls input[type="range"]{flex:1; cursor:pointer; accent-color:var(--accent)}
-  .controls button:focus-visible,.controls select:focus-visible,.controls input[type="range"]:focus-visible{outline:none; box-shadow:var(--focus)}
-  @media (hover:hover){
-    .controls button:hover,.controls select:hover{background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.24)}
-  }
-  .pill{display:inline-flex; gap:6px; align-items:center; background:var(--glass); border:1px solid var(--edge); color:var(--ink); padding:6px 10px; border-radius:999px; font-size:13px; transition:background .3s ease, border-color .3s ease;}
-  @media (hover:hover){ .pill:hover{background:rgba(255,255,255,.16); border-color:rgba(255,255,255,.24);} }
-  textarea{width:100%; min-height:110px; background:rgba(255,255,255,.08); border:1px solid var(--edge); border-radius:14px; padding:12px; font:inherit; color:var(--ink); resize:vertical; box-shadow:inset 0 4px 12px rgba(0,0,0,.18); transition:border-color .3s ease, box-shadow .3s ease;}
-  textarea:focus-visible{outline:none; box-shadow:var(--focus); border-color:rgba(255,255,255,.28);}
-  .prompt-box{margin-bottom:10px; padding:16px; border-radius:14px; background:rgba(255,255,255,.08); font-weight:600; line-height:1.5; letter-spacing:.2px;}
-
-  .garden{position:relative; overflow:hidden; min-height:220px; display:flex; flex-direction:column; gap:8px}
-  .soil{ position:absolute; bottom:-20px; left:-20px; right:-20px; height:110px; background: radial-gradient(200px 80px at 50% 0%, rgba(0,0,0,.25), transparent), linear-gradient(#32463a, #1b2a22); border-top-left-radius:30px; border-top-right-radius:30px; box-shadow: inset 0 10px 30px rgba(255,255,255,.08); }
-  .plant{position:absolute; bottom:76px; left:50%; transform:translateX(-50%); width:240px; height:240px; pointer-events:none; opacity:.95}
-  .bud,.leaf{position:absolute; background:linear-gradient(180deg, #85dfb0, #2f7a48); border-radius:120px 120px 0 120px; transform-origin:bottom center; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35))}
-  .bud{width:18px;height:18px; left:50%; transform:translateX(-50%) rotate(45deg)}
-  .leaf{width:22px;height:60px; border-radius:60px 60px 0 60px}
-  .stem{position:absolute; left:50%; transform:translateX(-50%); bottom:0; width:6px; height:120px; background:linear-gradient(#3b925e, #215238); border-radius:999px}
-  .progress{display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:12px; background:var(--glass); font-size:14px}
-  .chip{padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.12); border:1px solid var(--edge)}
-
-  .bubbles{position:relative; min-height:260px; overflow:hidden; border-radius:var(--radius);
-           background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));}
-  .bubble{
-    position:absolute; width:40px;height:40px;border-radius:50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.75), rgba(255,255,255,.06) 40%, rgba(255,255,255,.03) 65%);
-    border:1px solid rgba(180,200,220,.35); box-shadow: inset 0 0 20px rgba(255,255,255,.25);
-    cursor:pointer; user-select:none; animation: floatUp linear forwards;
-  }
-  @keyframes auroraDrift{
-    from{transform:translate3d(-1%, -1%, 0) scale(1);}
-    to{transform:translate3d(1.5%, 1.2%, 0) scale(1.06);}
-  }
-  @keyframes floatUp{ from{ transform: translateY(0) scale(1); opacity:.9} to{ transform: translateY(-120vh) scale(1.15); opacity:0}}
-  .affirm{position:absolute; pointer-events:none; font-weight:800; text-shadow:0 2px 8px rgba(0,0,0,.45); opacity:0;
-          transform: translate(-50%, -50%) scale(.96); transition: transform .8s ease, opacity .8s ease; left:50%; top:50%;}
-
-  .grounding-area{min-height:220px}
-  .ground-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-  .ground-pill{display:inline-flex; align-items:center; gap:8px; background:var(--glass);
-               border:1px solid var(--edge); border-radius:999px; padding:6px 10px; font-size:13px}
-  .ground-screen{ margin-top:10px; padding:18px; border-radius:14px; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; text-align:center; min-height:120px; font-weight:700; letter-spacing:.3px }
-
-  /* 30s grounding progress */
-  .progress-bar{ position:relative; height:10px; width:100%; background:rgba(255,255,255,.08); border:1px solid var(--edge); border-radius:999px; overflow:hidden; }
-  .progress-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent2)); box-shadow: inset 0 0 8px rgba(0,0,0,.2); transition: width .25s ease; }
-
-  canvas#petals{ position:absolute; inset:0; z-index:1; pointer-events:none; }
-  .site-footer{
-    width:min(1100px, calc(100% - 32px));
-    margin:26px auto 40px;
-    background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(0,0,0,.2)), var(--card);
-    border:1px solid var(--edge);
-    border-radius:calc(var(--radius) + 10px);
-    box-shadow:0 20px 42px rgba(0,0,0,.34);
-    backdrop-filter:blur(18px) saturate(1.08);
-    padding:22px 26px;
-    text-align:center;
-    color:var(--muted);
-    display:flex; flex-direction:column; gap:10px;
-  }
-  .site-footer .disclaimer{font-size:13px; line-height:1.6; margin:0;}
-  .site-footer .credit{font-size:12px; margin:0; opacity:.85;}
-  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-  .hidden{display:none !important}
-  .sr-only{position:absolute !important; height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#173c32">
+  <meta name="description" content="Calm Garden is a private, free collection of breathing, grounding, reflection, and gentle focus exercises.">
+  <meta name="author" content="Ali Jouni">
+  <meta property="og:title" content="Calm Garden — a gentler moment">
+  <meta property="og:description" content="Breathe, ground, play, and grow at your own pace.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/calm-garden-mark.svg">
+  <title>Calm Garden — a gentler moment</title>
+  <link rel="icon" href="assets/calm-garden-mark.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<div class="wrap" role="application" aria-label="Calm Garden game">
-  <header>
-    <h1>🌿 Calm Garden</h1>
-    <div class="tip">Breathe, ground, pop bubbles — and grow a tiny plant.</div>
-    <label class="theme-label" for="themeSelect">Theme
-      <select id="themeSelect" aria-label="Choose a color theme">
-        <option value="default">Evergreen</option>
-        <option value="pink">Blossom (Pink)</option>
-        <option value="baby">Daylight (Baby Blue)</option>
-      </select>
-    </label>
-    <div class="spacer"></div>
-    <button id="restartAll" class="bar-btn" aria-label="Restart everything">🔄 Restart all</button>
-    <button id="mute" class="bar-btn" aria-label="Toggle sound">🔊 Sound: On</button>
+<body data-theme="forest">
+  <a class="skip-link" href="#mainContent">Skip to activities</a>
+
+  <div class="ambient" aria-hidden="true">
+    <span class="ambient__orb ambient__orb--one"></span>
+    <span class="ambient__orb ambient__orb--two"></span>
+    <span class="ambient__orb ambient__orb--three"></span>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Calm Garden home">
+      <img src="assets/calm-garden-mark.svg" alt="" width="42" height="42">
+      <span>
+        <strong>Calm Garden</strong>
+        <small>A gentler moment</small>
+      </span>
+    </a>
+
+    <div class="header-actions">
+      <label class="select-control" for="themeSelect">
+        <span>Theme</span>
+        <select id="themeSelect" aria-label="Choose colour theme">
+          <option value="forest">Forest</option>
+          <option value="ocean">Ocean</option>
+          <option value="dusk">Dusk</option>
+          <option value="blossom">Blossom</option>
+        </select>
+      </label>
+      <button class="icon-button" id="soundToggle" type="button" aria-pressed="true" aria-label="Turn sound off">
+        <span aria-hidden="true" id="soundIcon">♪</span>
+        <span id="soundLabel">Sound on</span>
+      </button>
+    </div>
   </header>
 
-  <main>
-    <!-- Breathing -->
-    <section class="side-left card" aria-labelledby="breath-title">
-      <h2 id="breath-title" class="title">Breathing</h2>
-      <p class="desc">Follow the orb through inhale / hold / exhale. Slow rhythmic breathing calms the nervous system.</p>
-      <div class="orb-wrap card" aria-live="polite">
-        <div class="orb" id="orb" role="img" aria-label="Breathing orb"></div>
-        <div class="cue" id="cue">Tap Start</div>
+  <main id="mainContent">
+    <section class="hero" id="top" aria-labelledby="heroTitle">
+      <div class="hero__copy">
+        <span class="eyebrow">Free · private · no account</span>
+        <h1 id="heroTitle">Take the next minute softly.</h1>
+        <p>Choose one small activity. There is nothing to win, finish, or get perfect here.</p>
+        <div class="hero__actions">
+          <button class="button button--primary" type="button" data-open-activity="breathe">Start breathing</button>
+          <button class="button button--secondary" type="button" data-open-activity="ground">Ground me now</button>
+        </div>
       </div>
-      <div class="controls">
-        <button id="start" aria-label="Start breathing">▶ Start</button>
-        <button id="stop" aria-label="Stop breathing" disabled>⏸ Stop</button>
-        <label class="pill" for="pattern">Pattern
-          <select id="pattern" aria-label="Breathing pattern">
-            <option value="4-2-6">Calm 4–2–6</option>
-            <option value="4-4-4-4">Box 4–4–4–4</option>
-            <option value="4-7-8">4–7–8</option>
-            <option value="5-5-5">Gentle 5–5–5</option>
-          </select>
-        </label>
-        <label class="pill" for="cyclesWanted">Goal
-          <select id="cyclesWanted" aria-label="Cycle goal">
-            <option>5</option><option selected>10</option><option>15</option><option>20</option>
-          </select>
-        </label>
-        <label class="pill" for="speed">Speed
-          <input id="speed" type="range" min="0.75" max="1.5" step="0.05" value="1" aria-label="Breathing speed" />
-        </label>
-        <label class="pill" for="soundscape">Soundscape
-          <select id="soundscape" aria-label="Ambient soundscape">
-            <option value="off">Off</option>
-            <option value="rain">Gentle rain</option>
-            <option value="forest">Forest birds</option>
-            <option value="waves">Ocean waves</option>
-          </select>
-        </label>
-      </div>
-      <div class="progress" aria-live="polite">
-        <span>Cycles: <strong id="cycles">0</strong> / <span id="goal">10</span></span>
-        <span class="chip" id="streak">Streak: 0</span>
+
+      <div class="hero__garden" aria-hidden="true">
+        <div class="hero__moon"></div>
+        <div class="hero__hill hero__hill--back"></div>
+        <div class="hero__hill hero__hill--front"></div>
+        <div class="hero__plant">
+          <span class="hero__stem"></span>
+          <span class="hero__leaf hero__leaf--left"></span>
+          <span class="hero__leaf hero__leaf--right"></span>
+          <span class="hero__flower"></span>
+        </div>
+        <span class="hero__sparkle hero__sparkle--one">✦</span>
+        <span class="hero__sparkle hero__sparkle--two">·</span>
+        <span class="hero__sparkle hero__sparkle--three">✦</span>
       </div>
     </section>
 
-    <!-- Center column -->
-    <section class="center">
-      <div class="garden card" aria-labelledby="garden-title">
-        <h2 id="garden-title" class="title">Your tiny garden</h2>
-        <p class="desc">Each 2 cycles adds growth. Watch leaves appear and the stem stretch as you practice.</p>
-        <div class="plant" aria-hidden="true">
-          <span class="stem" id="stem"></span>
-          <span class="bud" id="bud"></span>
+    <section class="progress-strip" aria-label="Your local progress">
+      <article>
+        <span class="metric-icon" aria-hidden="true">◌</span>
+        <span><strong id="totalCycles">0</strong><small>breathing cycles</small></span>
+      </article>
+      <article>
+        <span class="metric-icon" aria-hidden="true">⌁</span>
+        <span><strong id="gardenStage">Seed</strong><small>garden stage</small></span>
+      </article>
+      <article>
+        <span class="metric-icon" aria-hidden="true">○</span>
+        <span><strong id="totalPopped">0</strong><small>bubbles released</small></span>
+      </article>
+      <button class="text-button" id="resetProgress" type="button">Reset progress</button>
+    </section>
+
+    <section class="activity-shell" aria-labelledby="activitiesTitle">
+      <div class="activity-shell__intro">
+        <div>
+          <span class="eyebrow">Choose what helps now</span>
+          <h2 id="activitiesTitle">Your calm space</h2>
         </div>
-        <div class="soil" aria-hidden="true"></div>
-        <div class="progress" style="margin-top:12px">
-          <span>Growth: <strong id="growthLabel">Seed</strong></span>
-          <span class="chip">🌱 <span id="growth">0</span></span>
-        </div>
+        <p>Switch activities at any time. Your progress and reflection stay only on this device.</p>
       </div>
 
-      <div class="bubbles card" id="bubblesArea" aria-labelledby="bubbles-title" role="region">
-        <h2 id="bubbles-title" class="title">Soft bubble pop</h2>
-        <p class="desc">Tap bubbles and read the gentle words that appear. Light, playful focus for busy minds.</p>
-        <div class="row">
-          <button id="release" aria-label="Release bubbles">🫧 Release</button>
-          <button id="clearBubbles" aria-label="Clear bubbles">🧹 Clear</button>
-          <span class="chip">Popped: <strong id="popped">0</strong></span>
-        </div>
-        <div id="bubbles" style="position:relative; height: 220px; margin-top:8px"></div>
+      <div class="activity-tabs" role="tablist" aria-label="Calming activities">
+        <button id="tab-breathe" role="tab" aria-selected="true" aria-controls="panel-breathe" data-activity="breathe">
+          <span aria-hidden="true">◌</span>Breathe
+        </button>
+        <button id="tab-ground" role="tab" aria-selected="false" aria-controls="panel-ground" data-activity="ground" tabindex="-1">
+          <span aria-hidden="true">⌖</span>Ground
+        </button>
+        <button id="tab-play" role="tab" aria-selected="false" aria-controls="panel-play" data-activity="play" tabindex="-1">
+          <span aria-hidden="true">○</span>Play
+        </button>
+        <button id="tab-reflect" role="tab" aria-selected="false" aria-controls="panel-reflect" data-activity="reflect" tabindex="-1">
+          <span aria-hidden="true">✎</span>Reflect
+        </button>
       </div>
 
-      <!-- 30-second grounding -->
-      <div class="card" id="quickGround" aria-labelledby="qg-title" role="region">
-        <h2 id="qg-title" class="title">30-second grounding</h2>
-        <p class="desc">This quick exercise helps you notice what’s around you and feel calmer. A brief 5-4-3-2-1 check-in.</p>
-        <div class="row">
-          <button id="qgStart" class="bar-btn">🧭 Start</button>
-          <button id="qgStop" class="bar-btn" disabled>⏹ Stop</button>
-          <span class="chip"><strong id="qgTime">30</strong>s</span>
-        </div>
-        <div class="ground-screen" id="qgScreen">Press Start to begin a fast grounding round.</div>
-        <div class="progress" style="margin-top:10px">
-          <div class="progress-bar"><span id="qgFill" class="progress-fill"></span></div>
-        </div>
-      </div>
+      <div class="activity-panels">
+        <section class="activity-panel" id="panel-breathe" role="tabpanel" aria-labelledby="tab-breathe">
+          <div class="panel-copy">
+            <span class="panel-kicker">Guided breathing</span>
+            <h3>Follow the circle, not the clock.</h3>
+            <p>Let the orb guide your inhale, pause, and exhale. Stop whenever your body asks you to.</p>
 
-      <div class="card" id="reflection" aria-labelledby="reflection-title" role="region">
-        <h2 id="reflection-title" class="title">Gentle reflection</h2>
-        <p class="desc">Capture a soft thought or gratitude to deepen your calm.</p>
-        <div id="reflectionPrompt" class="prompt-box" role="status" aria-live="polite"></div>
-        <textarea id="reflectionNote" aria-label="Reflection note" placeholder="Write a few calming words…"></textarea>
-        <div class="row" style="margin-top:10px">
-          <button id="nextPrompt" class="bar-btn">🔄 Next prompt</button>
-          <button id="saveReflection" class="bar-btn">💾 Save note</button>
-        </div>
+            <div class="field-grid">
+              <label>
+                <span>Pattern</span>
+                <select id="patternSelect">
+                  <option value="4-2-6">Calm · 4–2–6</option>
+                  <option value="4-4-4-4">Box · 4–4–4–4</option>
+                  <option value="4-7-8">Deep · 4–7–8</option>
+                  <option value="5-5-5">Gentle · 5–5–5</option>
+                </select>
+              </label>
+              <label>
+                <span>Session goal</span>
+                <select id="cycleGoal">
+                  <option value="3">3 cycles</option>
+                  <option value="5" selected>5 cycles</option>
+                  <option value="10">10 cycles</option>
+                  <option value="15">15 cycles</option>
+                </select>
+              </label>
+              <label class="range-field">
+                <span>Tempo <output id="speedValue">1×</output></span>
+                <input id="speedRange" type="range" min="0.75" max="1.35" step="0.05" value="1">
+              </label>
+              <label>
+                <span>Background sound</span>
+                <select id="soundscapeSelect">
+                  <option value="off">Quiet</option>
+                  <option value="rain">Soft rain</option>
+                  <option value="waves">Slow waves</option>
+                  <option value="forest">Night garden</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="button-row">
+              <button class="button button--primary" id="breathStart" type="button">Start session</button>
+              <button class="button button--secondary" id="breathPause" type="button" disabled>Pause</button>
+            </div>
+            <p class="shortcut">Keyboard: <kbd>Space</kbd> start or pause · <kbd>M</kbd> sound</p>
+          </div>
+
+          <div class="breathing-stage">
+            <div class="breathing-ring" id="breathingRing" style="--progress: 0">
+              <div class="breathing-orb" id="breathingOrb">
+                <span id="breathCue">Ready</span>
+                <strong id="breathSeconds">—</strong>
+              </div>
+            </div>
+            <div class="session-progress" aria-live="polite">
+              <span>Session</span>
+              <strong><span id="sessionCycles">0</span> / <span id="sessionGoal">5</span> cycles</strong>
+            </div>
+            <div class="progress-track" aria-hidden="true"><span id="sessionProgress"></span></div>
+          </div>
+        </section>
+
+        <section class="activity-panel" id="panel-ground" role="tabpanel" aria-labelledby="tab-ground" hidden>
+          <div class="panel-copy">
+            <span class="panel-kicker">5–4–3–2–1 grounding</span>
+            <h3>Come back to what is here.</h3>
+            <p>Move through the senses slowly, or choose the automatic 30-second reset.</p>
+            <div class="button-row">
+              <button class="button button--primary" id="groundStart" type="button">Begin grounding</button>
+              <button class="button button--secondary" id="quickGroundStart" type="button">30-second reset</button>
+            </div>
+          </div>
+
+          <div class="grounding-card" aria-live="polite">
+            <span class="grounding-card__step" id="groundStepLabel">Ready when you are</span>
+            <div class="grounding-card__number" id="groundNumber">5</div>
+            <h4 id="groundTitle">Notice your surroundings</h4>
+            <p id="groundInstruction">Press begin and take this one sense at a time.</p>
+            <div class="grounding-card__timer" id="groundTimer" hidden>
+              <span id="groundTimerValue">30</span> seconds
+            </div>
+            <div class="button-row button-row--center">
+              <button class="button button--primary" id="groundNext" type="button" disabled>Next sense</button>
+              <button class="text-button" id="groundStop" type="button" disabled>Stop</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="activity-panel" id="panel-play" role="tabpanel" aria-labelledby="tab-play" hidden>
+          <div class="panel-copy">
+            <span class="panel-kicker">Gentle focus</span>
+            <h3>Grow something small.</h3>
+            <p>Each two completed breathing cycles grows your garden. Pop bubbles for a light moment of focus.</p>
+            <div class="garden-summary">
+              <span>Current stage</span>
+              <strong id="gardenStageDetail">Seed</strong>
+              <small><span id="gardenGrowth">0</span> growth points</small>
+            </div>
+            <div class="button-row">
+              <button class="button button--primary" id="releaseBubbles" type="button">Release bubbles</button>
+              <button class="button button--secondary" id="clearBubbles" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="play-stage">
+            <div class="garden-scene" id="gardenScene" aria-label="Your growing calm garden" role="img">
+              <div class="garden-sky"></div>
+              <div class="garden-cloud garden-cloud--one"></div>
+              <div class="garden-cloud garden-cloud--two"></div>
+              <div class="garden-ground"></div>
+              <div class="plant" id="plant">
+                <span class="plant__stem" id="plantStem"></span>
+                <span class="plant__bud" id="plantBud"></span>
+              </div>
+            </div>
+            <div class="bubble-zone" id="bubbleZone" aria-label="Bubble popping area"></div>
+            <div class="play-counter">Bubbles popped <strong id="poppedDetail">0</strong></div>
+          </div>
+        </section>
+
+        <section class="activity-panel" id="panel-reflect" role="tabpanel" aria-labelledby="tab-reflect" hidden>
+          <div class="panel-copy">
+            <span class="panel-kicker">Private reflection</span>
+            <h3>Leave one gentle thought here.</h3>
+            <p>This note is stored only in your browser. It is never uploaded or shared.</p>
+            <button class="button button--secondary" id="nextPrompt" type="button">Another prompt</button>
+          </div>
+
+          <div class="reflection-card">
+            <blockquote id="reflectionPrompt"></blockquote>
+            <label for="reflectionNote">Your note</label>
+            <textarea id="reflectionNote" rows="7" placeholder="A few words are enough…"></textarea>
+            <div class="reflection-actions">
+              <span id="saveStatus" role="status" aria-live="polite">Saved locally</span>
+              <button class="button button--primary" id="saveReflection" type="button">Save note</button>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
 
-    <!-- Right column -->
-    <section class="side-right card" aria-labelledby="ground-title">
-      <h2 id="ground-title" class="title">Grounding</h2>
-      <p class="desc">The classic 5-4-3-2-1 check-in anchors you in the present using senses and gratitude.</p>
-      <div class="grounding-area">
-        <div class="ground-row">
-          <button id="groundStart" class="bar-btn">🧭 Start</button>
-          <button id="groundStop" class="bar-btn" disabled>⏹ Stop</button>
-          <span class="ground-pill">Step <strong id="gStep">0</strong>/5</span>
+    <section class="care-note" aria-labelledby="careNoteTitle">
+      <div>
+        <span class="care-note__icon" aria-hidden="true">♡</span>
+        <div>
+          <h2 id="careNoteTitle">This tool can support a pause, not replace care.</h2>
+          <p>If you feel unsafe or may hurt yourself or someone else, contact local emergency services or a trusted person near you now.</p>
         </div>
-        <div class="ground-screen" id="groundScreen">Press Start to begin grounding.</div>
       </div>
-      <hr style="border-color:rgba(255,255,255,.12)">
-      <h3 class="title" style="font-size:16px; margin-top:10px">Notes & options</h3>
-      <p class="desc">• Space toggles breathing. • “Reduce Motion” is respected. • M toggles sound.</p>
-      <div class="row"><button id="reset" class="bar-btn" aria-label="Reset progress">♻ Reset progress</button></div>
+      <button class="button button--secondary" id="supportInfo" type="button">Support information</button>
     </section>
-
-    <canvas id="petals"></canvas>
   </main>
 
   <footer class="site-footer">
-    <p class="disclaimer">Not medical advice. If you’re in immediate danger or thinking of harming yourself, contact local emergency services.</p>
-    <p class="credit">Made by Ali Jouni — Free for everyone to use, copy, and modify.</p>
+    <p>Made with care by <strong>Ali Jouni</strong>. Free to use.</p>
+    <p>Private by design: no account, analytics, advertising, or cloud storage.</p>
   </footer>
-</div>
 
-<script>
-(function(){
-  var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  /* ===== gentle chimes ===== */
-  var audioCtx = null;
-  var soundOn = true;
-  function createSeededRandom(seed){
-    var v = seed >>> 0;
-    return function(){ v = (v * 1664525 + 1013904223) >>> 0; return v / 4294967296; };
-  }
-  function createWaveData(samples, sampleRate){
-    var frameCount = samples.length;
-    var buffer = new ArrayBuffer(44 + frameCount * 2);
-    var view = new DataView(buffer);
-    var offset = 0;
-    function writeString(str){ for (var i=0;i<str.length;i++){ view.setUint8(offset++, str.charCodeAt(i)); } }
-    function writeUint32(val){ view.setUint32(offset, val, true); offset += 4; }
-    function writeUint16(val){ view.setUint16(offset, val, true); offset += 2; }
-    writeString('RIFF');
-    writeUint32(36 + frameCount * 2);
-    writeString('WAVE');
-    writeString('fmt ');
-    writeUint32(16);
-    writeUint16(1);
-    writeUint16(1);
-    writeUint32(sampleRate);
-    writeUint32(sampleRate * 2);
-    writeUint16(2);
-    writeUint16(16);
-    writeString('data');
-    writeUint32(frameCount * 2);
-    for (var i=0;i<frameCount;i++){
-      var s = Math.max(-1, Math.min(1, samples[i]));
-      view.setInt16(offset, s * 32767, true);
-      offset += 2;
-    }
-    var bytes = new Uint8Array(buffer);
-    var binary = '';
-    for (var j=0;j<bytes.length;j+=0x8000){
-      var chunk = bytes.subarray(j, j+0x8000);
-      binary += String.fromCharCode.apply(null, chunk);
-    }
-    return 'data:audio/wav;base64,' + btoa(binary);
-  }
-  function buildSoundscapeData(kind){
-    var sampleRate = 8000;
-    var seconds = kind === 'waves' ? 4 : 2.5;
-    var total = Math.floor(sampleRate * seconds);
-    var data = new Float32Array(total);
-    var rand = createSeededRandom(kind === 'rain' ? 1 : kind === 'forest' ? 2 : 3);
-    var last = 0;
-    for (var i=0;i<total;i++){
-      var t = i / sampleRate;
-      var value = 0;
-      if (kind === 'rain'){
-        last = last * 0.7 + (rand()*2 - 1) * 0.3;
-        var drizzle = (rand()*2 - 1) * 0.15;
-        value = last * 0.55 + drizzle;
-      }else if (kind === 'forest'){
-        var base = Math.sin(2*Math.PI*180*t) * 0.08 + Math.sin(2*Math.PI*220*t) * 0.06;
-        var bird = Math.sin(2*Math.PI*(780 + 160*Math.sin(2*Math.PI*0.45*t))*t) * 0.05;
-        var rustle = (rand()*2 - 1) * 0.04;
-        value = base + bird + rustle;
-      }else{ // waves
-        var swell = Math.sin(2*Math.PI*0.18*t) * 0.5;
-        var foam = Math.sin(2*Math.PI*0.8*t) * 0.18;
-        var ripple = (rand()*2 - 1) * 0.08;
-        value = swell + foam + ripple;
-      }
-      var fadeIn = Math.min(1, i / (sampleRate * 0.25));
-      var fadeOut = Math.min(1, (total - i - 1) / (sampleRate * 0.25));
-      var window = Math.max(0, Math.min(fadeIn, fadeOut));
-      data[i] = value * window;
-    }
-    return createWaveData(data, sampleRate);
-  }
-  var soundscapes = {
-    off: null,
-    rain: buildSoundscapeData('rain'),
-    forest: buildSoundscapeData('forest'),
-    waves: buildSoundscapeData('waves')
-  };
-  function ensureAudio(){ if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
-  function chime(freq, time, type, gain){
-    if (freq===undefined) freq=440; if (time===undefined) time=0.3; if (type===undefined) type='sine'; if (gain===undefined) gain=0.05;
-    if (!soundOn) return;
-    try{
-      var ctx = ensureAudio();
-      var o = ctx.createOscillator(); var g = ctx.createGain();
-      o.type = type; o.frequency.value = freq;
-      g.gain.setValueAtTime(0, ctx.currentTime);
-      g.gain.linearRampToValueAtTime(gain, ctx.currentTime + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + time);
-      o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + time + 0.02);
-    }catch(e){}
-  }
-  function popSound(){ chime(740,0.08,'sine',0.04); setTimeout(function(){ chime(520,0.08,'sine',0.035); },50); }
+  <dialog class="support-dialog" id="supportDialog" aria-labelledby="supportTitle">
+    <div class="support-dialog__top">
+      <span class="care-note__icon" aria-hidden="true">♡</span>
+      <button class="icon-button icon-button--compact" id="closeSupport" type="button" aria-label="Close support information">×</button>
+    </div>
+    <h2 id="supportTitle">Get immediate support</h2>
+    <p>Calm Garden is not an emergency service. When there is immediate danger:</p>
+    <ol>
+      <li>Call your local emergency number.</li>
+      <li>Move away from anything you could use to hurt yourself.</li>
+      <li>Contact someone you trust and ask them to stay with you.</li>
+      <li>Go to the nearest emergency department when you can do so safely.</li>
+    </ol>
+    <p class="dialog-note">You deserve real human support. Reaching out is a strong next step.</p>
+    <button class="button button--primary" id="closeSupportPrimary" type="button">Return to Calm Garden</button>
+  </dialog>
 
-  /* ===== Elements ===== */
-  var orb = document.getElementById('orb');
-  var cue = document.getElementById('cue');
-  var startBtn = document.getElementById('start');
-  var stopBtn  = document.getElementById('stop');
-  var patternSel = document.getElementById('pattern');
-  var speedRange = document.getElementById('speed');
-  var cyclesEl = document.getElementById('cycles');
-  var goalEl = document.getElementById('goal');
-  var streakEl = document.getElementById('streak');
-  var growthEl = document.getElementById('growth');
-  var growthLabel = document.getElementById('growthLabel');
-  var muteBtn = document.getElementById('mute');
-  var soundscapeSel = document.getElementById('soundscape');
-  var resetBtn = document.getElementById('reset');
-  var cyclesWantedSel = document.getElementById('cyclesWanted');
-  var restartAllBtn = document.getElementById('restartAll');
-  var themeSelect = document.getElementById('themeSelect');
-
-  var plant = document.querySelector('.plant');
-  var stem = document.getElementById('stem');
-  var bud = document.getElementById('bud');
-
-  var releaseBtn = document.getElementById('release');
-  var clearBubblesBtn = document.getElementById('clearBubbles');
-  var poppedEl = document.getElementById('popped');
-  var bubblesWrap = document.getElementById('bubbles');
-
-  var gStart = document.getElementById('groundStart');
-  var gStop = document.getElementById('groundStop');
-  var gScreen = document.getElementById('groundScreen');
-  var gStepEl = document.getElementById('gStep');
-
-  var qgStart = document.getElementById('qgStart');
-  var qgStop  = document.getElementById('qgStop');
-  var qgScreen = document.getElementById('qgScreen');
-  var qgTimeEl = document.getElementById('qgTime');
-  var qgFill = document.getElementById('qgFill');
-
-  var reflectionPromptEl = document.getElementById('reflectionPrompt');
-  var reflectionNoteEl = document.getElementById('reflectionNote');
-  var reflectionNextBtn = document.getElementById('nextPrompt');
-  var reflectionSaveBtn = document.getElementById('saveReflection');
-
-  /* ===== State ===== */
-  var cycles = Number(localStorage.getItem('cg_cycles') || 0);
-  var growth = Number(localStorage.getItem('cg_growth') || 0);
-  var popped = Number(localStorage.getItem('cg_popped') || 0);
-  var streak = 0;
-  var running = false;
-  var cancelTimer = null;
-  var currentPattern = (localStorage.getItem('cg_pattern') || patternSel.value);
-  var currentSoundscapeChoice = (localStorage.getItem('cg_soundscape') || 'off');
-  var currentThemeChoice = (localStorage.getItem('cg_theme') || 'default');
-  var currentGoal = (localStorage.getItem('cg_goal') || cyclesWantedSel.value);
-
-  var reflectionPrompts = [
-    'What is one small kindness you can offer yourself right now?',
-    'Name three things in this moment that you feel grateful for.',
-    'What is something gentle you can notice with your senses?',
-    'Write a short mantra you want to carry through the day.',
-    'How does your body feel softer or lighter after pausing?'
-  ];
-  var reflectionIndex = Number(localStorage.getItem('cg_reflection_index') || 0);
-  if (!reflectionPrompts[reflectionIndex]) reflectionIndex = 0;
-  var reflectionNote = localStorage.getItem('cg_reflection_note') || '';
-
-  cyclesEl.textContent = cycles;
-  growthEl.textContent = growth;
-  poppedEl.textContent = popped;
-  patternSel.value = currentPattern;
-  soundscapeSel.value = currentSoundscapeChoice;
-  cyclesWantedSel.value = currentGoal;
-  goalEl.textContent = cyclesWantedSel.value;
-  if (reflectionNoteEl) reflectionNoteEl.value = reflectionNote;
-  if (themeSelect){ themeSelect.value = currentThemeChoice; }
-
-  function applyTheme(value){
-    if (!value || value === 'default'){
-      document.body.removeAttribute('data-theme');
-    }else{
-      document.body.setAttribute('data-theme', value);
-    }
-  }
-  applyTheme(currentThemeChoice);
-
-  function save(){
-    localStorage.setItem('cg_cycles', cycles);
-    localStorage.setItem('cg_growth', growth);
-    localStorage.setItem('cg_popped', popped);
-    localStorage.setItem('cg_pattern', patternSel.value);
-    localStorage.setItem('cg_goal', cyclesWantedSel.value);
-    if (soundscapeSel) localStorage.setItem('cg_soundscape', soundscapeSel.value);
-  }
-
-  if (themeSelect){
-    themeSelect.addEventListener('change', function(){
-      var value = themeSelect.value || 'default';
-      applyTheme(value);
-      localStorage.setItem('cg_theme', value);
-    });
-  }
-
-  function renderReflectionPrompt(){
-    if (reflectionPromptEl) reflectionPromptEl.innerHTML = reflectionPrompts[reflectionIndex];
-  }
-  function persistReflectionState(){
-    localStorage.setItem('cg_reflection_index', reflectionIndex);
-    if (reflectionNoteEl) localStorage.setItem('cg_reflection_note', reflectionNoteEl.value);
-  }
-  function nextReflectionPrompt(opts){
-    reflectionIndex = (reflectionIndex + 1) % reflectionPrompts.length;
-    renderReflectionPrompt();
-    persistReflectionState();
-    if (!(opts && opts.silent)) toast('New reflection prompt ready.');
-  }
-  function promptReflectionNudge(){
-    if (!reflectionPrompts.length) return;
-    nextReflectionPrompt({silent:true});
-    setTimeout(function(){ toast('Take a quiet moment to jot a reflection.'); }, 2100);
-  }
-  renderReflectionPrompt();
-  if (reflectionNoteEl){
-    reflectionNoteEl.addEventListener('input', function(){
-      localStorage.setItem('cg_reflection_note', reflectionNoteEl.value);
-    });
-  }
-  if (reflectionNextBtn){
-    reflectionNextBtn.addEventListener('click', function(){
-      nextReflectionPrompt();
-      chime(520,0.18,'sine',0.02);
-    });
-  }
-  if (reflectionSaveBtn){
-    reflectionSaveBtn.addEventListener('click', function(){
-      persistReflectionState();
-      toast('Reflection saved.');
-      chime(480,0.18,'sine',0.018);
-    });
-  }
-
-  var soundscapeBuffers = {};
-  var currentSoundscapeSource = null;
-  function stopSoundscape(fadeMs){
-    if (!currentSoundscapeSource || !audioCtx) return;
-    try{
-      var ctx = audioCtx;
-      var gain = currentSoundscapeSource.gain;
-      var now = ctx.currentTime;
-      var dur = (fadeMs || 400) / 1000;
-      if (gain){
-        var current = gain.gain.value;
-        gain.gain.cancelScheduledValues(now);
-        gain.gain.setValueAtTime(current, now);
-        gain.gain.linearRampToValueAtTime(0.0001, now + dur);
-      }
-      currentSoundscapeSource.source.stop(now + dur + 0.05);
-    }catch(e){ try{ currentSoundscapeSource.source.stop(); }catch(_){} }
-    currentSoundscapeSource = null;
-  }
-  function startSoundscapeBuffer(buffer){
-    if (!buffer) return;
-    var ctx = ensureAudio();
-    var source = ctx.createBufferSource();
-    var gain = ctx.createGain();
-    source.buffer = buffer;
-    source.loop = true;
-    if (buffer.duration > 0.12){
-      source.loopStart = 0.05;
-      source.loopEnd = buffer.duration - 0.05;
-    }
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 1.8);
-    source.connect(gain).connect(ctx.destination);
-    source.start();
-    currentSoundscapeSource = { source: source, gain: gain };
-  }
-  function playSoundscape(value){
-    if (!soundOn){ return; }
-    if (!value || value === 'off'){ stopSoundscape(300); return; }
-    var url = soundscapes[value];
-    if (!url){ stopSoundscape(300); return; }
-    var ctx = ensureAudio();
-    if (ctx.state === 'suspended'){ ctx.resume(); }
-    stopSoundscape(200);
-    if (soundscapeBuffers[value]){ startSoundscapeBuffer(soundscapeBuffers[value]); return; }
-    fetch(url).then(function(resp){ return resp.arrayBuffer(); }).then(function(arr){
-      return ctx.decodeAudioData(arr);
-    }).then(function(buffer){
-      soundscapeBuffers[value] = buffer;
-      startSoundscapeBuffer(buffer);
-    }).catch(function(){});
-  }
-  if (soundscapeSel){
-    soundscapeSel.addEventListener('change', function(){
-      save();
-      if (soundOn) playSoundscape(soundscapeSel.value);
-      else stopSoundscape(200);
-    });
-  }
-  if (soundOn && soundscapeSel && soundscapeSel.value !== 'off'){
-    setTimeout(function(){ playSoundscape(soundscapeSel.value); }, 100);
-  }
-
-  function setCue(text){ cue.textContent = text; }
-  function setScale(scale, durSec){
-    orb.style.setProperty('--scale', String(scale));
-    orb.style.setProperty('--dur', String(durSec) + 's');
-  }
-  function parsePattern(pat){
-    var parts = pat.split('-').map(Number);
-    if (parts.length === 3) return {inhale:parts[0], hold:parts[1], exhale:parts[2], hold2:0};
-    if (parts.length === 4) return {inhale:parts[0], hold:parts[1], exhale:parts[2], hold2:parts[3]};
-    return {inhale:4, hold:2, exhale:6, hold2:0};
-  }
-  function growthName(n){
-    if (n < 3) return 'Seed';
-    if (n < 6) return 'Sprout';
-    if (n < 10) return 'Sapling';
-    if (n < 15) return 'Bush';
-    return 'Little tree';
-  }
-  function addLeaf(angleDeg, len){
-    if (len===undefined) len=60;
-    var leaf = document.createElement('span');
-    leaf.className = 'leaf';
-    leaf.style.height = String(Math.max(40, len)) + 'px';
-    leaf.style.transform = 'translate(-50%, 0) rotate(' + angleDeg + 'deg)';
-    leaf.style.left = '50%';
-    leaf.style.bottom = String(40 + Math.random()*60) + 'px';
-    plant.appendChild(leaf);
-    if (!prefersReducedMotion){
-      leaf.animate(
-        [{transform:'translate(-50%,0) rotate(' + (angleDeg-6) + 'deg)'},
-         {transform:'translate(-50%,0) rotate(' + (angleDeg+6) + 'deg)'}],
-        {duration: 3200 + Math.random()*2200, iterations: Infinity, direction:'alternate', easing:'ease-in-out'}
-      );
-    }
-  }
-  function updateGarden(){
-    growthLabel.textContent = growthName(growth);
-    var leaves = plant.querySelectorAll('.leaf');
-    var need = Math.max(0, growth - leaves.length);
-    for(var i=0;i<need;i++){
-      var angle = (i%2===0 ? -40 - Math.random()*25 : 40 + Math.random()*25);
-      addLeaf(angle, 40 + Math.random()*40);
-    }
-    stem.style.height = String(90 + Math.min(growth*4, 120)) + 'px';
-    bud.style.bottom = String(parseInt(stem.style.height,10) - 4) + 'px';
-  }
-  updateGarden();
-
-  /* ===== Breathing loop ===== */
-  function runBreathing(){
-    if (running) return;
-    running = true;
-    startBtn.disabled = true; stopBtn.disabled = false;
-    ensureAudio();
-    var pat = parsePattern(patternSel.value);
-    var speedF = Number(speedRange.value);
-
-    var steps = [
-      {label:'Inhale…', scale:1.35, dur:pat.inhale/speedF, tone:432}
-    ];
-    if (pat.hold) steps.push({label:'Hold…', scale:1.35, dur:pat.hold/speedF, tone:520});
-    steps.push({label:'Exhale…', scale:0.85, dur:pat.exhale/speedF, tone:392});
-    if (pat.hold2) steps.push({label:'Hold…', scale:0.85, dur:pat.hold2/speedF, tone:520});
-
-    var k = 0;
-    function step(){
-      if (!running) return;
-      var s = steps[k];
-      setCue(s.label);
-      setScale(s.scale, s.dur);
-      chime(s.tone, 0.25, 'sine', 0.03);
-      cancelTimer = setTimeout(function(){
-        k = (k+1)%steps.length;
-        if (k===0){
-          cycles++; streak++;
-          cyclesEl.textContent = String(cycles);
-          streakEl.textContent = 'Streak: ' + String(streak);
-          if (streak % 2 === 0){
-            growth++; growthEl.textContent = String(growth); updateGarden();
-            chime(660,0.22,'sine',0.035); setTimeout(function(){ chime(880,0.18,'sine',0.03); },80);
-          }
-          save();
-          var goal = Number(cyclesWantedSel.value);
-          if (goal && cycles % goal === 0){
-            toast('Nice work. Your garden grew!');
-            promptReflectionNudge();
-          }
-        }
-        step();
-      }, s.dur*1000 + 60);
-    }
-    step();
-  }
-  function stopBreathing(){
-    running = false;
-    startBtn.disabled = false; stopBtn.disabled = true;
-    setCue('Paused');
-    if (cancelTimer) clearTimeout(cancelTimer);
-    streak = 0; streakEl.textContent = 'Streak: 0';
-  }
-  startBtn.addEventListener('click', runBreathing);
-  stopBtn.addEventListener('click', stopBreathing);
-  speedRange.addEventListener('input', function(){ if (running){ stopBreathing(); runBreathing(); }});
-  patternSel.addEventListener('change', function(){ save(); if (running){ stopBreathing(); runBreathing(); }});
-  cyclesWantedSel.addEventListener('change', function(){
-    goalEl.textContent = cyclesWantedSel.value;
-    localStorage.setItem('cg_goal', cyclesWantedSel.value);
-  });
-  window.addEventListener('keydown', function(e){
-    if (e.code === 'Space'){ e.preventDefault(); if (running) stopBreathing(); else runBreathing(); }
-    else if ((e.key||'').toLowerCase() === 'm'){ toggleSound(); }
-  });
-
-  /* ===== Bubbles ===== */
-  var affirmations = [
-    'You are safe','This will pass','Breathe easy','Gentle is enough','One step at a time',
-    'You matter','Here & now','Soft shoulders','Inhale calm','Exhale worry',
-    'Let it drift','Grounded & present','Slow is okay','Your pace is perfect','Calm grows with practice',
-    'Unclench your jaw','Relax your brow','Feel your feet','Peace on the exhale','Lightness returns',
-    'Calm is within you','Every breath is a reset','Ease flows through you','You are stronger than you think',
-    'One breath at a time',"Release what you can't control",'Peace is possible now','Stillness is strength',
-    'Let your shoulders drop','Feel the air support you','You are enough right now','Quiet is healing',
-    'The present is safe','Trust your rhythm','Balance returns gently'
-  ];
-
-  function releaseBubbles(count){
-    if (count===undefined) count=12;
-    var areaRect = bubblesWrap.getBoundingClientRect();
-    for (var i=0; i<count; i++){
-      var b = document.createElement('div');
-      b.className = 'bubble';
-      var size = 26 + Math.random()*48;
-      var duration = 10000 + Math.random()*5000;
-      b.style.width = String(size) + 'px';
-      b.style.height = String(size) + 'px';
-      b.style.left = String(Math.random() * (areaRect.width - size)) + 'px';
-      b.style.top = String(areaRect.height - size - 5) + 'px';
-      b.style.animationDuration = String(duration) + 'ms';
-      b.setAttribute('aria-label','Bubble'); b.setAttribute('role','button'); b.tabIndex = 0;
-
-      var handlePop = function(ev, el, sz){
-        return function(){
-          el.removeEventListener('click', handlePop);
-          el.removeEventListener('keydown', keyPop);
-          el.style.pointerEvents='none'; el.style.opacity='0';
-          popped++; poppedEl.textContent = String(popped); save();
-          popSound(); if (navigator.vibrate) navigator.vibrate(15);
-          showAffirmation(el.offsetLeft + sz/2, el.offsetTop);
-          el.remove();
-        };
-      }(null, b, size);
-
-      function keyPop(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); handlePop(); } }
-
-      b.addEventListener('click', handlePop);
-      b.addEventListener('keydown', keyPop);
-      bubblesWrap.appendChild(b);
-      setTimeout(function(){ if (document.body.contains(b)) b.remove(); }, duration + 2000);
-    }
-  }
-
-  function showAffirmation(x,y){
-    var a = document.createElement('div');
-    a.className = 'affirm';
-    a.textContent = affirmations[Math.floor(Math.random()*affirmations.length)];
-    bubblesWrap.appendChild(a);
-    a.style.left = String(x) + 'px';
-    a.style.top  = String(y) + 'px';
-    requestAnimationFrame(function(){ a.style.opacity = '1'; a.style.transform = 'translate(-50%, -120%) scale(1)'; });
-    setTimeout(function(){ a.remove(); }, 1800);
-  }
-
-  document.getElementById('release').addEventListener('click', function(){ releaseBubbles(14); });
-  clearBubblesBtn.addEventListener('click', function(){
-    bubblesWrap.querySelectorAll('.bubble,.affirm').forEach(function(el){ el.remove(); });
-  });
-
-  /* ===== Petals background ===== */
-  var canvas = document.getElementById('petals');
-  var ctx = canvas.getContext('2d', {alpha:true});
-  var W=0,H=0, petals=[];
-  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; if (petals.length===0) spawnPetals(); }
-  function spawnPetals(){
-    var count = prefersReducedMotion ? 8 : 24;
-    petals = Array.from({length: count}).map(function(){ return { x: Math.random()*W, y: Math.random()*H, r: 3 + Math.random()*4, s: .15 + Math.random()*.6, t: Math.random()*Math.PI*2 }; });
-  }
-  function drawPetal(p){
-    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(Math.sin(p.t)*.6);
-    var g = ctx.createRadialGradient(0,0,0, 0,0,p.r*2);
-    g.addColorStop(0, 'rgba(255,255,255,.8)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(0,0,p.r*.6, p.r*1.4, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
-  }
-  function tick(){
-    ctx.clearRect(0,0,W,H);
-    for(var i=0;i<petals.length;i++){
-      var p = petals[i];
-      p.t += 0.008; p.y += p.s * .45; p.x += Math.sin(p.t)*.22;
-      if (p.y > H+20){ p.y = -20; p.x = Math.random()*W; }
-      drawPetal(p);
-    }
-    if (!prefersReducedMotion) requestAnimationFrame(tick);
-  }
-  resize(); window.addEventListener('resize', resize); if (!prefersReducedMotion) requestAnimationFrame(tick);
-
-  /* ===== Grounding (right) ===== */
-  var stepsGround = [
-    'Look around and name <strong>5 things</strong> you can <em>see</em>.',
-    'Gently touch <strong>4 things</strong> you can <em>feel</em>.',
-    'Listen for <strong>3 sounds</strong> you can <em>hear</em>.',
-    'Notice <strong>2 scents</strong> you can <em>smell</em>.',
-    'Name <strong>1 taste or gratitude</strong> you can <em>sense</em>.'
-  ];
-  var gIndex = -1, gTimer = null;
-  function groundRender(){
-    gStepEl.textContent = String(Math.max(0,gIndex+1));
-    gScreen.innerHTML = (gIndex < 0) ? 'Press Start to begin grounding.' : stepsGround[gIndex];
-  }
-  function startGrounding(){
-    ensureAudio(); gIndex = -1; groundRender();
-    gStart.disabled = true; gStop.disabled = false;
-    chime(520,0.18);
-    function advance(){
-      gIndex++;
-      if (gIndex >= stepsGround.length){
-        stopGrounding();
-        toast('Nice job — you’re back here & now.'); chime(640,0.25); setTimeout(function(){ chime(820,0.2); },160);
-        return;
-      }
-      groundRender(); chime(520,0.18);
-    }
-    advance();
-    gTimer = setInterval(advance, 5000);
-  }
-  function stopGrounding(){
-    if (gTimer){ clearInterval(gTimer); gTimer=null; }
-    gStart.disabled = false; gStop.disabled = true;
-    gIndex = -1; groundRender();
-  }
-  gStart.addEventListener('click', startGrounding);
-  gStop.addEventListener('click', stopGrounding);
-
-  /* ===== Quick Grounding: 30s (center) ===== */
-  var qgSteps = [
-    '👀 Name 5 things you can see.',
-    '🤲 Touch 4 things you can feel.',
-    '👂 Hear 3 sounds you can notice.',
-    '👃 Notice 2 scents you can smell.',
-    '💚 Name 1 taste or gratitude.'
-  ];
-  var qgTick = null, qgSeconds = 30, qgIndex = -1;
-  function qgRender(){
-    qgTimeEl.textContent = String(qgSeconds);
-    var pct = ((30 - qgSeconds) / 30) * 100;
-    qgFill.style.width = String(pct) + '%';
-    qgScreen.innerHTML = (qgIndex < 0) ? 'Press Start to begin a fast grounding round.' : qgSteps[qgIndex];
-  }
-  function qgAdvance(){ qgIndex = Math.min(qgIndex + 1, qgSteps.length - 1); qgRender(); chime(520,0.18); }
-  function startQuickGrounding(){
-    if (qgTick) return;
-    ensureAudio();
-    qgSeconds = 30; qgIndex = -1;
-    qgStart.disabled = true; qgStop.disabled = false;
-    toast('Grounding started — look around.'); chime(640,0.22);
-    qgAdvance(); // first step immediately
-    var elapsed = 0;
-    qgTick = setInterval(function(){
-      qgSeconds--; elapsed++; qgRender();
-      if (elapsed % 5 === 0 && qgIndex < qgSteps.length - 1) qgAdvance();
-      if (qgSeconds <= 0) finishQuickGrounding();
-    }, 1000);
-  }
-  function finishQuickGrounding(){
-    stopQuickGrounding();
-    toast('Nice job — you’re back here & now.');
-    chime(640,0.25); setTimeout(function(){ chime(820,0.2); },160);
-    promptReflectionNudge();
-  }
-  function stopQuickGrounding(){
-    if (qgTick){ clearInterval(qgTick); qgTick=null; }
-    qgStart.disabled = false; qgStop.disabled = true;
-    qgSeconds = 30; qgIndex = -1; qgRender();
-  }
-  if (qgStart) qgStart.addEventListener('click', startQuickGrounding);
-  if (qgStop)  qgStop.addEventListener('click', stopQuickGrounding);
-  qgRender();
-
-  /* ===== Toast, Sound, Reset, Restart-all ===== */
-  function toast(text){
-    var t = document.createElement('div');
-    t.innerHTML = text;
-    t.style.position='fixed'; t.style.bottom='18px'; t.style.left='50%'; t.style.transform='translateX(-50%)';
-    t.style.padding='10px 14px'; t.style.background='rgba(0,0,0,.55)'; t.style.color='white';
-    t.style.borderRadius='999px'; t.style.boxShadow='0 8px 20px rgba(0,0,0,.25)'; t.style.zIndex='9999'; t.style.fontWeight='700'; t.style.letterSpacing='.3px';
-    document.body.appendChild(t);
-    t.style.transition = 'opacity .6s';
-    setTimeout(function(){ t.style.opacity='0'; }, 2000);
-    setTimeout(function(){ t.remove(); }, 2600);
-  }
-  function toggleSound(){
-    soundOn = !soundOn;
-    muteBtn.textContent = soundOn ? '🔊 Sound: On' : '🔇 Sound: Off';
-    if (soundOn){
-      var ctx = ensureAudio();
-      if (ctx.state === 'suspended') ctx.resume();
-      if (soundscapeSel && soundscapeSel.value !== 'off') playSoundscape(soundscapeSel.value);
-    }else{
-      stopSoundscape(300);
-    }
-  }
-  muteBtn.addEventListener('click', toggleSound);
-
-  resetBtn.addEventListener('click', function(){
-    if (confirm('Reset garden & counters?')){
-      cycles = 0; growth = 0; popped = 0; streak = 0;
-      localStorage.removeItem('cg_cycles'); localStorage.removeItem('cg_growth'); localStorage.removeItem('cg_popped');
-      plant.querySelectorAll('.leaf').forEach(function(el){ el.remove(); });
-      updateGarden();
-      cyclesEl.textContent = '0'; growthEl.textContent='0'; poppedEl.textContent='0'; streakEl.textContent = 'Streak: 0';
-      toast('Progress reset');
-    }
-  });
-
-  restartAllBtn.addEventListener('click', function(){
-    if (confirm('Restart everything and start a fresh session?')){
-      try{ localStorage.clear(); }catch(e){}
-      location.reload();
-    }
-  });
-
-  document.body.addEventListener('click', function(){
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    if (soundOn && soundscapeSel && soundscapeSel.value !== 'off') playSoundscape(soundscapeSel.value);
-  }, {once:true});
-})();
-</script>
+  <script src="app.js" defer></script>
 </body>
 </html>
